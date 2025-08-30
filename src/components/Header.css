@@ -43,12 +43,31 @@
     margin-bottom: 0.5rem;
   }
   
-  .logo-circle {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--primary-color);
+  /* Updated logo styling */
+  .logo-image {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
     transition: all 0.3s ease;
+    filter: var(--logo-filter);
+  }
+  
+  /* Logo filter for theme switching */
+  .light-theme .logo-image {
+    --logo-filter: none;
+  }
+  
+  .dark-theme .logo-image {
+    --logo-filter: brightness(0) invert(1);
+  }
+  
+  .logo-image:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Remove the old logo-circle class since we're using the actual logo */
+  .logo-circle {
+    display: none;
   }
   
   .brand-name {
@@ -144,6 +163,11 @@
     .tab-button {
       width: 100%;
     }
+    
+    .logo-image {
+      width: 35px;
+      height: 35px;
+    }
   }
   
   @media (max-width: 480px) {
@@ -165,9 +189,35 @@
       font-size: 1.25rem;
     }
     
-    .logo-circle {
-      width: 28px;
-      height: 28px;
+    .logo-image {
+      width: 32px;
+      height: 32px;
+    }
+  }
+  
+  /* Additional styling for better logo integration */
+  .motive-logo:hover .logo-image {
+    transform: scale(1.1) rotate(5deg);
+  }
+  
+  .motive-logo:hover .brand-name {
+    color: var(--secondary-color, var(--primary-color));
+  }
+  
+  /* Logo loading state */
+  .logo-image {
+    background: var(--surface-bg);
+    border-radius: 4px;
+  }
+  
+  .logo-image:not([src]) {
+    background: var(--border-color);
+  }
+  
+  /* High contrast mode adjustments */
+  @media (prefers-contrast: high) {
+    .logo-image {
+      border: 1px solid var(--border-color);
     }
   }
   

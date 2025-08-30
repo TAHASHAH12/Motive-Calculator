@@ -11,7 +11,11 @@ const Header = ({ activeTab, setActiveTab }) => {
       <div className="header-content">
         <div className="brand-section">
           <div className="motive-logo">
-            <div className="logo-circle"></div>
+            <img 
+              src="https://logowik.com/content/uploads/images/motive8791.logowik.com.webp" 
+              alt="Motive Logo" 
+              className="logo-image"
+            />
             <span className="brand-name">Motive</span>
           </div>
           <h1>Employee Performance & Salary Calculator</h1>
