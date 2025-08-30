@@ -1,38 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
   min-height: 100vh;
+  background: linear-gradient(135deg, #0090F3 0%, #004B8D 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1a1a1a;
+}
+
+.app-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 144, 243, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 144, 243, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+}
+
+.brand-section {
+  margin-bottom: 1.5rem;
+}
+
+.motive-logo {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.logo-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0090F3, #32C855);
+  box-shadow: 0 2px 8px rgba(0, 144, 243, 0.3);
+}
+
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0090F3;
+  letter-spacing: -0.025em;
+}
+
+.header-content h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 1rem;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 144, 243, 0.1);
+  border: 2px solid rgba(0, 144, 243, 0.2);
+  color: #0090F3;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 144, 243, 0.1), rgba(50, 200, 85, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tab-button:hover::before {
+  opacity: 1;
+}
+
+.tab-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 144, 243, 0.25);
+  border-color: #0090F3;
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #0090F3, #32C855);
   color: white;
+  border-color: transparent;
+  box-shadow: 0 8px 30px rgba(0, 144, 243, 0.4);
 }
 
-.App-link {
-  color: #61dafb;
+.tab-icon {
+  font-size: 1.1rem;
+  z-index: 1;
+  position: relative;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.main-content {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.app-footer {
+  background: rgba(0, 0, 0, 0.8);
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .header-content h1 {
+    font-size: 1.75rem;
+  }
+  
+  .tab-navigation {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .tab-button {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+  
+  .main-content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content h1 {
+    font-size: 1.5rem;
+  }
+  
+  .tab-button {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9rem;
   }
 }

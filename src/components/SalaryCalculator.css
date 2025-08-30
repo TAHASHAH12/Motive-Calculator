@@ -1,0 +1,461 @@
+.salary-calculator {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 144, 243, 0.1);
+    overflow: hidden;
+    animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .calculator-header {
+    background: linear-gradient(135deg, #32C855, #0090F3);
+    padding: 2rem;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  
+  .header-left h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.025em;
+  }
+  
+  .header-left p {
+    opacity: 0.9;
+    font-size: 1.1rem;
+    font-weight: 400;
+  }
+  
+  .reset-btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 0.875rem 1.25rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .reset-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+  }
+  
+  .calculator-content {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 0;
+  }
+  
+  .input-section {
+    padding: 2rem;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .section-card {
+    background: #fafbfc;
+    border: 1px solid #e1e8ed;
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .section-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(135deg, #32C855, #0090F3);
+  }
+  
+  .section-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 1.5rem;
+  }
+  
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .input-field.full-width {
+    grid-column: 1 / -1;
+  }
+  
+  .input-field label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  
+  .input-field input {
+    padding: 1rem;
+    border: 2px solid #e1e8ed;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: white;
+  }
+  
+  .input-field input:focus {
+    outline: none;
+    border-color: #32C855;
+    box-shadow: 0 0 0 3px rgba(50, 200, 85, 0.1);
+  }
+  
+  .input-field input::placeholder {
+    color: #999;
+    font-weight: 400;
+  }
+  
+  .rate-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  
+  .rate-card {
+    background: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .rate-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 144, 243, 0.1);
+  }
+  
+  .rate-card.extra-mile {
+    border-color: #0090F3;
+    background: rgba(0, 144, 243, 0.02);
+  }
+  
+  .rate-card.bonus {
+    border-color: #32C855;
+    background: rgba(50, 200, 85, 0.02);
+  }
+  
+  .rate-card.bonus.excellent {
+    border-color: #32C855;
+    background: rgba(50, 200, 85, 0.1);
+  }
+  
+  .rate-card.bonus.good {
+    border-color: #0090F3;
+    background: rgba(0, 144, 243, 0.1);
+  }
+  
+  .rate-card.bonus.none {
+    border-color: #ccc;
+    background: rgba(128, 128, 128, 0.02);
+  }
+  
+  .rate-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+  
+  .rate-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  
+  .rate-card.extra-mile .rate-value {
+    color: #0090F3;
+  }
+  
+  .rate-card.bonus.excellent .rate-value,
+  .rate-card.bonus.good .rate-value {
+    color: #32C855;
+  }
+  
+  .results-section {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-left: 1px solid #e1e8ed;
+    position: sticky;
+    top: 0;
+    height: fit-content;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .salary-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 144, 243, 0.1);
+    overflow: hidden;
+  }
+  
+  .salary-card h3 {
+    background: linear-gradient(135deg, #32C855, #0090F3);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding: 1.5rem;
+    margin: 0;
+    text-align: center;
+  }
+  
+  .earnings-section,
+  .deductions-section {
+    padding: 1.5rem;
+  }
+  
+  .earnings-section h4,
+  .deductions-section h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .breakdown-item:last-child {
+    border-bottom: none;
+  }
+  
+  .breakdown-item.subtotal {
+    border-top: 2px solid #e1e8ed;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  
+  .breakdown-label {
+    font-weight: 500;
+    color: #666;
+  }
+  
+  .breakdown-value {
+    font-weight: 700;
+    color: #1a1a1a;
+    font-size: 1.1rem;
+  }
+  
+  .breakdown-value.extra {
+    color: #0090F3;
+  }
+  
+  .breakdown-value.bonus {
+    color: #32C855;
+  }
+  
+  .breakdown-value.deduction {
+    color: #e53e3e;
+  }
+  
+  .deductions-section {
+    border-top: 1px solid #e1e8ed;
+  }
+  
+  .total-section {
+    background: linear-gradient(135deg, #32C855, #0090F3);
+    padding: 1.5rem;
+  }
+  
+  .breakdown-item.total {
+    border: none;
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+  
+  .breakdown-item.total .breakdown-label,
+  .breakdown-item.total .breakdown-value {
+    color: white;
+  }
+  
+  .bonus-criteria {
+    padding: 1.5rem;
+    background: #f8f9fa;
+  }
+  
+  .bonus-criteria h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .criteria-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .criteria-item {
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid;
+  }
+  
+  .criteria-item.excellent {
+    background: rgba(50, 200, 85, 0.1);
+    color: #2e7d32;
+    border-color: #32C855;
+  }
+  
+  .criteria-item.good {
+    background: rgba(0, 144, 243, 0.1);
+    color: #1976d2;
+    border-color: #0090F3;
+  }
+  
+  .criteria-item.none {
+    background: rgba(128, 128, 128, 0.1);
+    color: #666;
+    border-color: #ccc;
+  }
+  
+  .export-btn {
+    margin: 1.5rem;
+    background: linear-gradient(135deg, #0090F3, #32C855);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    font-family: inherit;
+    width: calc(100% - 3rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 144, 243, 0.3);
+  }
+  
+  .export-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 144, 243, 0.4);
+  }
+  
+  .export-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .calculator-content {
+      grid-template-columns: 1fr;
+    }
+    
+    .results-section {
+      position: static;
+      border-left: none;
+      border-top: 1px solid #e1e8ed;
+      max-height: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .calculator-header {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+    }
+    
+    .input-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .rate-info {
+      grid-template-columns: 1fr;
+    }
+    
+    .input-section {
+      padding: 1.5rem;
+    }
+    
+    .results-section {
+      padding: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .calculator-header {
+      padding: 1.5rem;
+    }
+    
+    .header-left h2 {
+      font-size: 1.5rem;
+    }
+    
+    .section-card {
+      padding: 1.5rem;
+    }
+    
+    .breakdown-item {
+      font-size: 0.9rem;
+    }
+    
+    .breakdown-value {
+      font-size: 1rem;
+    }
+  }
+  
