@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useQACalculations } from '../hooks/useCalculations';
 import './QACalculator.css';
 
 const QACalculator = () => {
   const [calculationType, setCalculationType] = useState('weekly');
   
-  // New Tags QA Data
   const [newTags, setNewTags] = useState({
     RRL: { qaCount: 0, correctCount: 0, qaError: 0 },
     LC: { qaCount: 0, correctCount: 0, qaError: 0 },
@@ -17,13 +17,11 @@ const QACalculator = () => {
     SD: { qaCount: 0, correctCount: 0, qaError: 0 }
   });
 
-  // Collision Tags QA Data
   const [collisionTags, setCollisionTags] = useState({
     'C/PC': { qaCount: 0, correctCount: 0, qaError: 0 },
     'NC': { qaCount: 0, correctCount: 0, qaError: 0 }
   });
 
-  // Other Tags QA Data
   const [otherTags, setOtherTags] = useState({
     Drowsiness: { qaCount: 0, correctCount: 0, qaError: 0 },
     SBV: { qaCount: 0, correctCount: 0, qaError: 0 },
@@ -34,107 +32,37 @@ const QACalculator = () => {
     ULC: { qaCount: 0, correctCount: 0, qaError: 0 }
   });
 
-  const [results, setResults] = useState({
-    newTagsScore: 0,
-    collisionScore: 0,
-    otherTagsScore: 0,
-    overallScore: 0
-  });
+  const results = useQACalculations(newTags, collisionTags, otherTags);
 
-  // Calculate New Tags Score (20% weightage)
-  const calculateNewTagsScore = () => {
-    let validTags = 0;
-    let totalAccuracy = 0;
-
-    Object.entries(newTags).forEach(([tag, data]) => {
-      if (data.qaCount > 0) {
-        const accuracy = ((data.correctCount + data.qaError) * 100) / data.qaCount;
-        totalAccuracy += accuracy;
-        validTags++;
-      }
-    });
-
-    if (validTags === 0) return 0;
-    const averageAccuracy = totalAccuracy / validTags;
-    return (averageAccuracy * 0.2);
-  };
-
-  // Calculate Collision Tags Score (30% weightage)
-  const calculateCollisionScore = () => {
-    const cpcData = collisionTags['C/PC'];
-    const ncData = collisionTags['NC'];
-
-    let cpcAccuracy = 0;
-    let ncAccuracy = 0;
-
-    if (cpcData.qaCount > 0) {
-      cpcAccuracy = ((cpcData.correctCount + cpcData.qaError) * 100) / cpcData.qaCount;
-    }
-
-    if (ncData.qaCount > 0) {
-      ncAccuracy = ((ncData.correctCount + ncData.qaError) * 100) / ncData.qaCount;
-    }
-
-    const cpcScore = (cpcAccuracy * 0.2);
-    const ncScore = (ncAccuracy * 0.1);
-
-    return cpcScore + ncScore;
-  };
-
-  // Calculate Other Tags Score (50% weightage)
-  const calculateOtherTagsScore = () => {
-    let totalQACount = 0;
-    let totalCorrectCount = 0;
-
-    Object.entries(otherTags).forEach(([tag, data]) => {
-      if (data.qaCount > 0) {
-        totalQACount += data.qaCount;
-        totalCorrectCount += data.correctCount;
-      }
-    });
-
-    if (totalQACount === 0) return 0;
-    const accuracy = (totalCorrectCount / totalQACount) * 100;
-    return accuracy * 0.5;
-  };
-
-  // Update calculations when data changes
-  useEffect(() => {
-    const newTagsScore = calculateNewTagsScore();
-    const collisionScore = calculateCollisionScore();
-    const otherTagsScore = calculateOtherTagsScore();
-    const overallScore = newTagsScore + collisionScore + otherTagsScore;
-
-    setResults({
-      newTagsScore,
-      collisionScore,
-      otherTagsScore,
-      overallScore
-    });
-  }, [newTags, collisionTags, otherTags]);
-
-  const handleInputChange = (category, tag, field, value) => {
-    const numValue = parseFloat(value) || 0;
+  const handleInputChange = useCallback((category, tag, field, value) => {
+    const numValue = Math.max(0, parseFloat(value) || 0);
     
-    if (category === 'newTags') {
-      setNewTags(prev => ({
+    const updateState = (setState) => {
+      setState(prev => ({
         ...prev,
-        [tag]: { ...prev[tag], [field]: numValue }
+        [tag]: { 
+          ...prev[tag], 
+          [field]: numValue 
+        }
       }));
-    } else if (category === 'collisionTags') {
-      setCollisionTags(prev => ({
-        ...prev,
-        [tag]: { ...prev[tag], [field]: numValue }
-      }));
-    } else if (category === 'otherTags') {
-      setOtherTags(prev => ({
-        ...prev,
-        [tag]: { ...prev[tag], [field]: numValue }
-      }));
-    }
-  };
+    };
 
-  const resetForm = () => {
+    switch (category) {
+      case 'newTags':
+        updateState(setNewTags);
+        break;
+      case 'collisionTags':
+        updateState(setCollisionTags);
+        break;
+      case 'otherTags':
+        updateState(setOtherTags);
+        break;
+      default:
+        break;
+    }
+  }, []);
+
+  const resetForm = useCallback(() => {
     const emptyData = { qaCount: 0, correctCount: 0, qaError: 0 };
     
     setNewTags(Object.keys(newTags).reduce((acc, key) => {
@@ -151,7 +79,7 @@ const QACalculator = () => {
       acc[key] = { ...emptyData };
       return acc;
     }, {}));
-  };
+  }, [newTags, collisionTags, otherTags]);
 
   const getScoreGrade = (score) => {
     if (score >= 90) return 'Excellent';
@@ -281,7 +209,7 @@ const QACalculator = () => {
                   <div className="score-bar">
                     <div 
                       className="score-fill new-tags" 
-                      style={{width: `${(results.newTagsScore / 20) * 100}%`}}
+                      style={{width: `${Math.min((results.newTagsScore / 20) * 100, 100)}%`}}
                     ></div>
                   </div>
                   <div className="score-text">{results.newTagsScore.toFixed(1)}/20%</div>
@@ -292,7 +220,7 @@ const QACalculator = () => {
                   <div className="score-bar">
                     <div 
                       className="score-fill collision" 
-                      style={{width: `${(results.collisionScore / 30) * 100}%`}}
+                      style={{width: `${Math.min((results.collisionScore / 30) * 100, 100)}%`}}
                     ></div>
                   </div>
                   <div className="score-text">{results.collisionScore.toFixed(1)}/30%</div>
@@ -303,7 +231,7 @@ const QACalculator = () => {
                   <div className="score-bar">
                     <div 
                       className="score-fill other-tags" 
-                      style={{width: `${(results.otherTagsScore / 50) * 100}%`}}
+                      style={{width: `${Math.min((results.otherTagsScore / 50) * 100, 100)}%`}}
                     ></div>
                   </div>
                   <div className="score-text">{results.otherTagsScore.toFixed(1)}/50%</div>

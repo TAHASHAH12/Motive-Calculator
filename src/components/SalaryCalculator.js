@@ -1,96 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useSalaryCalculations } from '../hooks/useCalculations';
 import './SalaryCalculator.css';
 
 const SalaryCalculator = () => {
   const [employeeData, setEmployeeData] = useState({
     name: '',
     baseSalary: 0,
-    workingDays: 22, // Default working days in a month
+    workingDays: 22,
     actualWorkingDays: 0,
     extraMileHours: 0,
-    hourlyRate: 0,
-    extraMileRate: 0, // 2x hourly rate
-    qaScore: 0,
-    performanceBonus: 0
+    qaScore: 0
   });
 
-  const [salaryBreakdown, setSalaryBreakdown] = useState({
-    basicSalary: 0,
-    extraMilePay: 0,
-    performanceBonus: 0,
-    totalSalary: 0,
-    deductions: 0,
-    netSalary: 0
-  });
+  const salaryBreakdown = useSalaryCalculations(employeeData);
 
-  // Calculate hourly rate based on base salary
-  useEffect(() => {
-    const hourlyRate = employeeData.baseSalary / (employeeData.workingDays * 8); // 8 hours per day
-    const extraMileRate = hourlyRate * 2; // 2x for extra mile
-    
+  const handleInputChange = useCallback((field, value) => {
     setEmployeeData(prev => ({
       ...prev,
-      hourlyRate,
-      extraMileRate
+      [field]: field === 'name' ? value : Math.max(0, parseFloat(value) || 0)
     }));
-  }, [employeeData.baseSalary, employeeData.workingDays]);
+  }, []);
 
-  // Calculate salary breakdown
-  useEffect(() => {
-    const basicSalary = (employeeData.actualWorkingDays / employeeData.workingDays) * employeeData.baseSalary;
-    const extraMilePay = employeeData.extraMileHours * employeeData.extraMileRate;
-    
-    // Performance bonus based on QA score
-    let performanceBonus = 0;
-    if (employeeData.qaScore >= 95) {
-      performanceBonus = basicSalary * 0.1; // 10% bonus for excellent performance
-    } else if (employeeData.qaScore >= 85) {
-      performanceBonus = basicSalary * 0.05; // 5% bonus for good performance
-    }
-
-    const totalSalary = basicSalary + extraMilePay + performanceBonus;
-    const deductions = totalSalary * 0.02; // 2% for tax/deductions
-    const netSalary = totalSalary - deductions;
-
-    setSalaryBreakdown({
-      basicSalary,
-      extraMilePay,
-      performanceBonus,
-      totalSalary,
-      deductions,
-      netSalary
-    });
-  }, [employeeData]);
-
-  const handleInputChange = (field, value) => {
-    setEmployeeData(prev => ({
-      ...prev,
-      [field]: parseFloat(value) || 0
-    }));
-  };
-
-  const handleStringInputChange = (field, value) => {
-    setEmployeeData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const resetCalculator = () => {
+  const resetCalculator = useCallback(() => {
     setEmployeeData({
       name: '',
       baseSalary: 0,
       workingDays: 22,
       actualWorkingDays: 0,
       extraMileHours: 0,
-      hourlyRate: 0,
-      extraMileRate: 0,
-      qaScore: 0,
-      performanceBonus: 0
+      qaScore: 0
     });
-  };
+  }, []);
 
-  const exportSalarySlip = () => {
+  const exportSalarySlip = useCallback(() => {
+    if (!employeeData.name.trim()) {
+      alert('Please enter employee name before exporting salary slip.');
+      return;
+    }
+
     const currentDate = new Date();
     const salarySlip = `
 ═══════════════════════════════════════
@@ -106,48 +53,46 @@ Generated: ${currentDate.toLocaleDateString('en-US')}
 ═══════════════════════════════════════
 
 Basic Salary (${employeeData.actualWorkingDays}/${employeeData.workingDays} days)
-                              PKR ${salaryBreakdown.basicSalary.toLocaleString()}
+                              PKR ${salaryBreakdown.basicSalary.toLocaleString('en-US', { maximumFractionDigits: 2 })}
 
-Extra Mile Pay (${employeeData.extraMileHours} hours @ PKR ${employeeData.extraMileRate.toFixed(2)}/hr)
-                              PKR ${salaryBreakdown.extraMilePay.toLocaleString()}
+Extra Mile Pay (${employeeData.extraMileHours} hours @ PKR ${salaryBreakdown.extraMileRate.toLocaleString('en-US', { maximumFractionDigits: 2 })}/hr)
+                              PKR ${salaryBreakdown.extraMilePay.toLocaleString('en-US', { maximumFractionDigits: 2 })}
 
 Performance Bonus (QA Score: ${employeeData.qaScore}%)
-                              PKR ${salaryBreakdown.performanceBonus.toLocaleString()}
+                              PKR ${salaryBreakdown.performanceBonus.toLocaleString('en-US', { maximumFractionDigits: 2 })}
 
 ═══════════════════════════════════════
                   DEDUCTIONS
 ═══════════════════════════════════════
 
 Tax & Other Deductions (2%)
-                              PKR ${salaryBreakdown.deductions.toLocaleString()}
+                              PKR ${salaryBreakdown.deductions.toLocaleString('en-US', { maximumFractionDigits: 2 })}
 
 ═══════════════════════════════════════
                     TOTAL
 ═══════════════════════════════════════
 
-Gross Salary:           PKR ${salaryBreakdown.totalSalary.toLocaleString()}
-Net Salary:             PKR ${salaryBreakdown.netSalary.toLocaleString()}
+Gross Salary:           PKR ${salaryBreakdown.totalSalary.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+Net Salary:             PKR ${salaryBreakdown.netSalary.toLocaleString('en-US', { maximumFractionDigits: 2 })}
 
 ═══════════════════════════════════════
-
-Note: Extra mile work is compensated at 2x the hourly rate.
-Performance bonuses are based on QA scores:
-• 95%+: 10% bonus
-• 85-94%: 5% bonus
-• Below 85%: No bonus
 
 Generated by Motive Employee Calculator
 `;
 
-    // Create and download the salary slip
-    const element = document.createElement('a');
-    const file = new Blob([salarySlip], { type: 'text/plain; charset=utf-8' });
-    element.href = URL.createObjectURL(file);
-    element.download = `Motive_Salary_Slip_${employeeData.name.replace(/\s+/g, '_')}_${currentDate.getMonth() + 1}_${currentDate.getFullYear()}.txt`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-  };
+    try {
+      const element = document.createElement('a');
+      const file = new Blob([salarySlip], { type: 'text/plain; charset=utf-8' });
+      element.href = URL.createObjectURL(file);
+      element.download = `Motive_Salary_Slip_${employeeData.name.replace(/\s+/g, '_')}_${currentDate.getMonth() + 1}_${currentDate.getFullYear()}.txt`;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    } catch (error) {
+      console.error('Error generating salary slip:', error);
+      alert('Error generating salary slip. Please try again.');
+    }
+  }, [employeeData, salaryBreakdown]);
 
   const getBonusInfo = (qaScore) => {
     if (qaScore >= 95) return { rate: '10%', class: 'excellent' };
@@ -178,7 +123,7 @@ Generated by Motive Employee Calculator
                 <input
                   type="text"
                   value={employeeData.name}
-                  onChange={(e) => handleStringInputChange('name', e.target.value)}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Enter employee name"
                 />
               </div>
@@ -243,11 +188,11 @@ Generated by Motive Employee Calculator
             <div className="rate-info">
               <div className="rate-card">
                 <div className="rate-label">Hourly Rate</div>
-                <div className="rate-value">PKR {employeeData.hourlyRate.toLocaleString()}</div>
+                <div className="rate-value">PKR {salaryBreakdown.hourlyRate.toLocaleString('en-US', { maximumFractionDigits: 2 })}</div>
               </div>
               <div className="rate-card extra-mile">
                 <div className="rate-label">Extra Mile Rate (2x)</div>
-                <div className="rate-value">PKR {employeeData.extraMileRate.toLocaleString()}</div>
+                <div className="rate-value">PKR {salaryBreakdown.extraMileRate.toLocaleString('en-US', { maximumFractionDigits: 2 })}</div>
               </div>
               <div className={`rate-card bonus ${getBonusInfo(employeeData.qaScore).class}`}>
                 <div className="rate-label">Performance Bonus</div>
@@ -265,22 +210,22 @@ Generated by Motive Employee Calculator
               <h4>💰 Earnings</h4>
               <div className="breakdown-item">
                 <span className="breakdown-label">Basic Salary</span>
-                <span className="breakdown-value">PKR {salaryBreakdown.basicSalary.toLocaleString()}</span>
+                <span className="breakdown-value">PKR {salaryBreakdown.basicSalary.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
               </div>
               
               <div className="breakdown-item">
                 <span className="breakdown-label">Extra Mile Pay</span>
-                <span className="breakdown-value extra">PKR {salaryBreakdown.extraMilePay.toLocaleString()}</span>
+                <span className="breakdown-value extra">PKR {salaryBreakdown.extraMilePay.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
               </div>
               
               <div className="breakdown-item">
                 <span className="breakdown-label">Performance Bonus</span>
-                <span className="breakdown-value bonus">PKR {salaryBreakdown.performanceBonus.toLocaleString()}</span>
+                <span className="breakdown-value bonus">PKR {salaryBreakdown.performanceBonus.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
               </div>
               
               <div className="breakdown-item subtotal">
                 <span className="breakdown-label">Gross Salary</span>
-                <span className="breakdown-value">PKR {salaryBreakdown.totalSalary.toLocaleString()}</span>
+                <span className="breakdown-value">PKR {salaryBreakdown.totalSalary.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
               </div>
             </div>
 
@@ -288,14 +233,14 @@ Generated by Motive Employee Calculator
               <h4>📋 Deductions</h4>
               <div className="breakdown-item">
                 <span className="breakdown-label">Tax & Others (2%)</span>
-                <span className="breakdown-value deduction">-PKR {salaryBreakdown.deductions.toLocaleString()}</span>
+                <span className="breakdown-value deduction">-PKR {salaryBreakdown.deductions.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
               </div>
             </div>
 
             <div className="total-section">
               <div className="breakdown-item total">
                 <span className="breakdown-label">Net Salary</span>
-                <span className="breakdown-value">PKR {salaryBreakdown.netSalary.toLocaleString()}</span>
+                <span className="breakdown-value">PKR {salaryBreakdown.netSalary.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
               </div>
             </div>
 
@@ -311,7 +256,7 @@ Generated by Motive Employee Calculator
             <button 
               className="export-btn" 
               onClick={exportSalarySlip}
-              disabled={!employeeData.name}
+              disabled={!employeeData.name.trim()}
             >
               <span>📄</span>
               Export Salary Slip

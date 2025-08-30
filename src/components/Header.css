@@ -1,0 +1,173 @@
+.app-header {
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    transform: translateY(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .app-header.hidden {
+    transform: translateY(-100%);
+  }
+  
+  .app-header.visible {
+    transform: translateY(0);
+  }
+  
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .brand-section {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .motive-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .logo-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    transition: all 0.3s ease;
+  }
+  
+  .brand-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    letter-spacing: -0.025em;
+  }
+  
+  .header-content h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin: 0;
+  }
+  
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .tab-navigation {
+    display: flex;
+    gap: 0.75rem;
+  }
+  
+  .tab-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 120px;
+    justify-content: center;
+  }
+  
+  .tab-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+  }
+  
+  .tab-button.active {
+    background: var(--primary-color);
+    color: var(--text-inverse);
+    border-color: transparent;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .tab-icon {
+    font-size: 1rem;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .header-content {
+      padding: 1rem;
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .brand-section {
+      min-width: auto;
+    }
+    
+    .header-content h1 {
+      font-size: 1.5rem;
+    }
+    
+    .header-controls {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .tab-navigation {
+      flex-direction: column;
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .tab-button {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .header-content {
+      padding: 0.75rem;
+    }
+    
+    .header-content h1 {
+      font-size: 1.25rem;
+    }
+    
+    .tab-button {
+      padding: 0.625rem 1rem;
+      font-size: 0.85rem;
+      min-width: 100px;
+    }
+    
+    .brand-name {
+      font-size: 1.25rem;
+    }
+    
+    .logo-circle {
+      width: 28px;
+      height: 28px;
+    }
+  }
+  
