@@ -5,24 +5,28 @@ import './QACalculator.css';
 const QACalculator = () => {
   const [calculationType, setCalculationType] = useState('weekly');
   
+  // UPDATED: New Tags QA Data - Added FCW, Removed USP
   const [newTags, setNewTags] = useState({
     RRL: { qaCount: 0, correctCount: 0, qaError: 0 },
     LC: { qaCount: 0, correctCount: 0, qaError: 0 },
     CII: { qaCount: 0, correctCount: 0, qaError: 0 },
     DFCO: { qaCount: 0, correctCount: 0, qaError: 0 },
     RFCO: { qaCount: 0, correctCount: 0, qaError: 0 },
-    USP: { qaCount: 0, correctCount: 0, qaError: 0 },
+    FCW: { qaCount: 0, correctCount: 0, qaError: 0 }, // Added FCW
     Smoking: { qaCount: 0, correctCount: 0, qaError: 0 },
     AD: { qaCount: 0, correctCount: 0, qaError: 0 },
     SD: { qaCount: 0, correctCount: 0, qaError: 0 }
   });
 
+  // Collision Tags QA Data (unchanged)
   const [collisionTags, setCollisionTags] = useState({
     'C/PC': { qaCount: 0, correctCount: 0, qaError: 0 },
     'NC': { qaCount: 0, correctCount: 0, qaError: 0 }
   });
 
+  // UPDATED: Other Tags QA Data - Added USP
   const [otherTags, setOtherTags] = useState({
+    USP: { qaCount: 0, correctCount: 0, qaError: 0 }, // Moved USP from New Tags
     Drowsiness: { qaCount: 0, correctCount: 0, qaError: 0 },
     SBV: { qaCount: 0, correctCount: 0, qaError: 0 },
     CP: { qaCount: 0, correctCount: 0, qaError: 0 },
