@@ -4,6 +4,7 @@ import Header from './components/Header';
 import QACalculator from './components/QACalculator';
 import SalaryCalculator from './components/SalaryCalculator';
 import GuidelinesPanel from './components/GuidelinesPanel';
+import AIPerformanceCoach from './components/AIPerformanceCoach';
 import './App.css';
 
 function App() {
@@ -17,6 +18,8 @@ function App() {
         return <SalaryCalculator />;
       case 'guidelines':
         return <GuidelinesPanel />;
+      case 'ai-coach':
+        return <AIPerformanceCoach />;
       default:
         return <QACalculator />;
     }

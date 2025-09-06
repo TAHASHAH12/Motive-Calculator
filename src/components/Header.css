@@ -203,6 +203,28 @@
     font-size: 0.85rem;
   }
 }
+/* 4-tab specific styles */
+@media (min-width: 769px) {
+  .tab-navigation {
+    gap: 0.5rem;
+  }
+  
+  .tab-button {
+    min-width: 100px;
+    font-size: 0.8rem;
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .tab-navigation {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 400px;
+  }
+}
 
 /* Additional styling for better logo integration */
 .motive-logo:hover .logo-image {

@@ -40,6 +40,14 @@ const Header = ({ activeTab, setActiveTab }) => {
               <span>Salary Calculator</span>
             </button>
             <button 
+              className={`tab-button ${activeTab === 'ai-coach' ? 'active' : ''}`}
+              onClick={() => setActiveTab('ai-coach')}
+              aria-pressed={activeTab === 'ai-coach'}
+            >
+              <span className="tab-icon">🤖</span>
+              <span>AI Coach</span>
+            </button>
+            <button 
               className={`tab-button ${activeTab === 'guidelines' ? 'active' : ''}`}
               onClick={() => setActiveTab('guidelines')}
               aria-pressed={activeTab === 'guidelines'}

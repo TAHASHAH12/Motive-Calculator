@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useQACalculations } from '../hooks/useCalculations';
 import './QACalculator.css';
 
@@ -51,13 +51,14 @@ const QACalculator = () => {
     ULC: 'https://docs.google.com/document/d/1QTLklxpsjHS5zcTEFC8xlCZONmLn-S6VGIHsXzjQY-U/edit'
   };
 
+  // Updated tag states with FCW in newTags and USP in otherTags
   const [newTags, setNewTags] = useState({
     RRL: { qaCount: 0, correctCount: 0, qaError: 0 },
     LC: { qaCount: 0, correctCount: 0, qaError: 0 },
     CII: { qaCount: 0, correctCount: 0, qaError: 0 },
     DFCO: { qaCount: 0, correctCount: 0, qaError: 0 },
     RFCO: { qaCount: 0, correctCount: 0, qaError: 0 },
-    FCW: { qaCount: 0, correctCount: 0, qaError: 0 },
+    FCW: { qaCount: 0, correctCount: 0, qaError: 0 }, // FCW added to New Tags
     Smoking: { qaCount: 0, correctCount: 0, qaError: 0 },
     AD: { qaCount: 0, correctCount: 0, qaError: 0 },
     SD: { qaCount: 0, correctCount: 0, qaError: 0 }
@@ -69,7 +70,7 @@ const QACalculator = () => {
   });
 
   const [otherTags, setOtherTags] = useState({
-    USP: { qaCount: 0, correctCount: 0, qaError: 0 },
+    USP: { qaCount: 0, correctCount: 0, qaError: 0 }, // USP moved to Other Tags
     Drowsiness: { qaCount: 0, correctCount: 0, qaError: 0 },
     SBV: { qaCount: 0, correctCount: 0, qaError: 0 },
     CP: { qaCount: 0, correctCount: 0, qaError: 0 },
@@ -104,6 +105,31 @@ const QACalculator = () => {
       setState: setOtherTags
     }
   };
+
+  // Save QA data to localStorage whenever it changes
+  useEffect(() => {
+    const qaData = {
+      newTags,
+      collisionTags,
+      otherTags
+    };
+    localStorage.setItem('motive-qa-data', JSON.stringify(qaData));
+  }, [newTags, collisionTags, otherTags]);
+
+  // Load QA data from localStorage on component mount
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem('motive-qa-data');
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        if (parsedData.newTags) setNewTags(parsedData.newTags);
+        if (parsedData.collisionTags) setCollisionTags(parsedData.collisionTags);
+        if (parsedData.otherTags) setOtherTags(parsedData.otherTags);
+      }
+    } catch (error) {
+      console.error('Error loading QA data:', error);
+    }
+  }, []);
 
   const handleInputChange = useCallback((category, tag, field, value) => {
     const numValue = Math.max(0, parseFloat(value) || 0);
@@ -156,320 +182,6 @@ const QACalculator = () => {
     return categories[activeCategory].data;
   };
 
-  // Enhanced AI Insights Component
-  const EnhancedInsightsPanel = ({ insights, tagAnalysis, openDocumentation }) => {
-    const [activeInsight, setActiveInsight] = useState('all');
-    const [expandedCards, setExpandedCards] = useState(new Set());
-
-    const toggleCard = (index) => {
-      const newExpanded = new Set(expandedCards);
-      if (newExpanded.has(index)) {
-        newExpanded.delete(index);
-      } else {
-        newExpanded.add(index);
-      }
-      setExpandedCards(newExpanded);
-    };
-
-    const insightCategories = {
-      all: { title: 'All Insights', icon: '🎯', color: '#3b82f6' },
-      critical: { title: 'Critical Issues', icon: '🔴', color: '#ef4444' },
-      warning: { title: 'Needs Improvement', icon: '🟡', color: '#f59e0b' },
-      success: { title: 'Excellent Work', icon: '🟢', color: '#22c55e' },
-      recommendations: { title: 'Smart Tips', icon: '💡', color: '#8b5cf6' }
-    };
-
-    const getDetailedInsights = () => {
-      const detailedInsights = [];
-
-      // Critical performance issues (accuracy < 70%)
-      const criticalTags = tagAnalysis.filter(tag => tag.accuracy < 70 && tag.qaCount > 0);
-      criticalTags.forEach(tag => {
-        detailedInsights.push({
-          type: 'critical',
-          priority: 'high',
-          tag: tag.tag,
-          title: `Critical: ${tag.tag} Performance Alert`,
-          message: `Your ${tag.tag} accuracy is only ${tag.accuracy.toFixed(1)}%. This significantly impacts your overall score.`,
-          recommendation: `Immediate action required. Review ${tag.tag} documentation and practice with examples.`,
-          impact: `Costing you ${(85 - tag.accuracy).toFixed(1)} percentage points`,
-          timeToImprove: '1-2 weeks with focused practice',
-          actionItems: [
-            `Study ${tag.tag} evaluation criteria`,
-            'Practice with sample events',
-            'Focus on common mistake patterns',
-            'Review edge cases and exceptions'
-          ]
-        });
-      });
-
-      // Performance improvement needed (70-85% accuracy)
-      const improvementTags = tagAnalysis.filter(tag => tag.accuracy >= 70 && tag.accuracy < 85 && tag.qaCount > 0);
-      improvementTags.forEach(tag => {
-        detailedInsights.push({
-          type: 'warning',
-          priority: 'medium',
-          tag: tag.tag,
-          title: `Improve ${tag.tag} Consistency`,
-          message: `${tag.tag} accuracy is ${tag.accuracy.toFixed(1)}%. You're close to the target of 85%+.`,
-          recommendation: `Focus on edge cases and review documentation for subtle criteria differences.`,
-          impact: `Potential gain of ${(90 - tag.accuracy).toFixed(1)} percentage points`,
-          timeToImprove: '3-5 days of focused review',
-          actionItems: [
-            'Review missed cases from recent evaluations',
-            'Study borderline examples',
-            'Practice with challenging scenarios',
-            'Double-check evaluation criteria'
-          ]
-        });
-      });
-
-      // Excellent performance recognition (95%+ accuracy)
-      const excellentTags = tagAnalysis.filter(tag => tag.accuracy >= 95 && tag.qaCount > 0);
-      if (excellentTags.length > 0) {
-        detailedInsights.push({
-          type: 'success',
-          priority: 'low',
-          title: 'Outstanding Performance!',
-          message: `Excellent work on ${excellentTags.map(t => t.tag).join(', ')}! Your accuracy is consistently above 95%.`,
-          recommendation: 'Maintain your current approach and help others learn from your expertise.',
-          impact: 'Contributing significantly to overall score',
-          timeToImprove: 'Already at target level',
-          actionItems: [
-            'Share knowledge with team members',
-            'Document your evaluation approach',
-            'Mentor others on these tag types',
-            'Stay updated with guideline changes'
-          ]
-        });
-      }
-
-      // Smart recommendations based on patterns
-      const tagCounts = tagAnalysis.filter(tag => tag.qaCount > 0);
-      if (tagCounts.length < 5) {
-        detailedInsights.push({
-          type: 'info',
-          priority: 'medium',
-          title: 'Increase Evaluation Diversity',
-          message: `You've only evaluated ${tagCounts.length} different tag types. Diversify your practice.`,
-          recommendation: 'Practice with different event types to build comprehensive skills.',
-          impact: 'Improved overall evaluation capabilities',
-          timeToImprove: '1-2 weeks',
-          actionItems: [
-            'Try evaluating different tag categories',
-            'Focus on less familiar event types',
-            'Build confidence across all areas',
-            'Request varied practice materials'
-          ]
-        });
-      }
-
-      // Overall performance pattern analysis
-      const overallAccuracy = tagAnalysis.length > 0 ? 
-        tagAnalysis.reduce((sum, tag) => sum + tag.accuracy, 0) / tagAnalysis.length : 0;
-      
-      if (overallAccuracy > 0 && overallAccuracy < 75) {
-        detailedInsights.push({
-          type: 'warning',
-          priority: 'high',
-          title: 'Overall Performance Improvement Needed',
-          message: `Your average accuracy across all tags is ${overallAccuracy.toFixed(1)}%. Focus on systematic improvement.`,
-          recommendation: 'Create a structured study plan focusing on your lowest-performing areas first.',
-          impact: 'Significant potential for score improvement',
-          timeToImprove: '2-4 weeks with consistent practice',
-          actionItems: [
-            'Identify and prioritize weakest areas',
-            'Set daily practice goals',
-            'Track improvement progress',
-            'Seek mentorship or additional training'
-          ]
-        });
-      }
-
-      return detailedInsights;
-    };
-
-    const detailedInsights = getDetailedInsights();
-    
-    const filteredInsights = activeInsight === 'all' 
-      ? detailedInsights 
-      : detailedInsights.filter(insight => {
-          if (activeInsight === 'recommendations') return insight.type === 'info';
-          return insight.type === activeInsight;
-        });
-
-    const getInsightIcon = (type, priority) => {
-      const icons = {
-        critical: '🚨',
-        warning: '⚠️',
-        success: '🎉',
-        info: '💡'
-      };
-      return icons[type] || '📋';
-    };
-
-    const getPriorityColor = (priority) => {
-      const colors = {
-        high: '#ef4444',
-        medium: '#f59e0b',
-        low: '#22c55e'
-      };
-      return colors[priority] || '#6b7280';
-    };
-
-    return (
-      <div className="enhanced-insights-panel">
-        <div className="insights-header">
-          <h3>🤖 AI Performance Coach</h3>
-          <p>Personalized recommendations based on your performance data</p>
-        </div>
-
-        {/* Category Filters */}
-        <div className="insight-categories">
-          {Object.entries(insightCategories).map(([key, category]) => {
-            const count = key === 'all' ? detailedInsights.length : 
-              key === 'recommendations' ? detailedInsights.filter(i => i.type === 'info').length :
-              detailedInsights.filter(i => i.type === key).length;
-            
-            return (
-              <button
-                key={key}
-                className={`category-filter ${activeInsight === key ? 'active' : ''}`}
-                onClick={() => setActiveInsight(key)}
-                style={{ '--category-color': category.color }}
-              >
-                <span className="category-icon">{category.icon}</span>
-                <div className="category-info">
-                  <span className="category-title">{category.title}</span>
-                  <span className="category-count">{count}</span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Insights Content */}
-        <div className="insights-content">
-          {filteredInsights.length === 0 ? (
-            <div className="no-insights">
-              <div className="no-insights-icon">🎯</div>
-              <h4>No insights available</h4>
-              <p>Add more QA data to get personalized recommendations.</p>
-            </div>
-          ) : (
-            <div className="insights-grid">
-              {filteredInsights.map((insight, index) => (
-                <div 
-                  key={index} 
-                  className={`insight-card enhanced ${insight.type} ${expandedCards.has(index) ? 'expanded' : ''}`}
-                >
-                  <div className="insight-card-header">
-                    <div className="insight-meta">
-                      <span className="insight-icon">
-                        {getInsightIcon(insight.type, insight.priority)}
-                      </span>
-                      <div className="insight-title-area">
-                        <h4>{insight.title}</h4>
-                        <span 
-                          className="priority-badge"
-                          style={{ backgroundColor: getPriorityColor(insight.priority) }}
-                        >
-                          {insight.priority} priority
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      className="expand-toggle"
-                      onClick={() => toggleCard(index)}
-                    >
-                      {expandedCards.has(index) ? '⌃' : '⌄'}
-                    </button>
-                  </div>
-
-                  <div className="insight-content">
-                    <p className="insight-message">{insight.message}</p>
-                    
-                    {insight.impact && (
-                      <div className="insight-impact">
-                        <span className="impact-label">📊 Impact:</span>
-                        <span className="impact-value">{insight.impact}</span>
-                      </div>
-                    )}
-
-                    <div className={`insight-details ${expandedCards.has(index) ? 'visible' : ''}`}>
-                      {insight.recommendation && (
-                        <div className="recommendation-section">
-                          <h5>💡 Recommendation:</h5>
-                          <p>{insight.recommendation}</p>
-                        </div>
-                      )}
-
-                      {insight.timeToImprove && (
-                        <div className="timeline-section">
-                          <span className="timeline-icon">⏱️</span>
-                          <span className="timeline-text">Expected improvement time: {insight.timeToImprove}</span>
-                        </div>
-                      )}
-
-                      {insight.actionItems && (
-                        <div className="action-items-section">
-                          <h5>✅ Action Items:</h5>
-                          <ul className="action-items-list">
-                            {insight.actionItems.map((item, itemIndex) => (
-                              <li key={itemIndex}>{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="insight-actions">
-                    {insight.tag && (
-                      <button
-                        className="action-button primary"
-                        onClick={() => openDocumentation(insight.tag)}
-                      >
-                        📖 Study {insight.tag} Guide
-                      </button>
-                    )}
-                    <button
-                      className="action-button secondary"
-                      onClick={() => toggleCard(index)}
-                    >
-                      {expandedCards.has(index) ? 'Show Less' : 'Show More'}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Performance Summary */}
-        {detailedInsights.length > 0 && (
-          <div className="performance-summary">
-            <h4>📈 Performance Summary</h4>
-            <div className="summary-stats">
-              <div className="summary-stat critical">
-                <span className="stat-number">{detailedInsights.filter(i => i.type === 'critical').length}</span>
-                <span className="stat-label">Critical Issues</span>
-              </div>
-              <div className="summary-stat warning">
-                <span className="stat-number">{detailedInsights.filter(i => i.type === 'warning').length}</span>
-                <span className="stat-label">Need Improvement</span>
-              </div>
-              <div className="summary-stat success">
-                <span className="stat-number">{detailedInsights.filter(i => i.type === 'success').length}</span>
-                <span className="stat-label">Excellent Areas</span>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   const renderTagCard = (tag, data) => {
     const accuracy = data.qaCount > 0 ? ((data.correctCount + data.qaError) / data.qaCount) * 100 : 0;
     const hasData = data.qaCount > 0;
@@ -502,6 +214,7 @@ const QACalculator = () => {
                 value={data.qaCount}
                 onChange={(e) => handleInputChange(activeCategory, tag, 'qaCount', e.target.value)}
                 className="compact-input"
+                placeholder="0"
               />
             </div>
             <div className="input-group">
@@ -513,6 +226,7 @@ const QACalculator = () => {
                 value={data.correctCount}
                 onChange={(e) => handleInputChange(activeCategory, tag, 'correctCount', e.target.value)}
                 className="compact-input"
+                placeholder="0"
               />
             </div>
             <div className="input-group">
@@ -523,6 +237,7 @@ const QACalculator = () => {
                 value={data.qaError}
                 onChange={(e) => handleInputChange(activeCategory, tag, 'qaError', e.target.value)}
                 className="compact-input"
+                placeholder="0"
               />
             </div>
           </div>
@@ -549,7 +264,7 @@ const QACalculator = () => {
       <div className="calculator-header">
         <div className="header-left">
           <h2>🎯 QA Score Calculator</h2>
-          <p>Smart performance tracking with AI-powered insights</p>
+          <p>Smart performance tracking with intelligent insights</p>
         </div>
         
         <div className="header-controls">
@@ -662,14 +377,23 @@ const QACalculator = () => {
             </div>
           </div>
 
-          {/* Enhanced AI Insights */}
-          {results.insights && results.tagAnalysis && (
-            <EnhancedInsightsPanel 
-              insights={results.insights}
-              tagAnalysis={results.tagAnalysis}
-              openDocumentation={openDocumentation}
-            />
-          )}
+          {/* AI Coach Prompt */}
+          <div className="ai-coach-prompt">
+            <div className="prompt-content">
+              <h4>🤖 Want AI-Powered Insights?</h4>
+              <p>Get personalized recommendations and improvement tips based on your performance data.</p>
+              <button 
+                className="coach-cta-button"
+                onClick={() => {
+                  // Navigate to AI Coach tab - you can replace this with your routing method
+                  const event = new CustomEvent('navigateToAICoach');
+                  window.dispatchEvent(event);
+                }}
+              >
+                Open AI Coach
+              </button>
+            </div>
+          </div>
 
           <div className="quick-stats">
             <div className="stat-item">
