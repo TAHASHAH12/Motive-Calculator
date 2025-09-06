@@ -4,265 +4,9 @@ import './QACalculator.css';
 
 const QACalculator = () => {
   const [calculationType, setCalculationType] = useState('weekly');
+  const [activeCategory, setActiveCategory] = useState('newTags');
   const [selectedTag, setSelectedTag] = useState(null);
-  const [showDetailedInsights, setShowDetailedInsights] = useState(false);
   
-  // Documentation links and detailed recommendations for each tag
-  const tagDocumentation = {
-    // New Tags
-    RRL: {
-      link: 'https://docs.google.com/document/d/1qCMjFlso9fsXPkvXy_Z_FY6o_RK2OVvK_n3AKE4Y2mw/edit',
-      commonMistakes: [
-        'Missing the exact moment of signal change',
-        'Confusing yellow light violations with red light',
-        'Not considering traffic flow context'
-      ],
-      keyPoints: [
-        'Vehicle must completely cross the stop line after signal turns red',
-        'Check timestamp carefully against signal change',
-        'Consider intersection type and visibility'
-      ]
-    },
-    LC: {
-      link: 'https://docs.google.com/document/d/1g0xayDpV9CRdw_mXgTJ-zH9cJ2p7l9fAQT937KDDuCQ/edit',
-      commonMistakes: [
-        'Not identifying the cutting vehicle correctly',
-        'Missing the severity of the cutoff',
-        'Confusing with normal lane changes'
-      ],
-      keyPoints: [
-        'Focus on sudden, unsafe lane changes',
-        'Check for adequate following distance',
-        'Verify impact on host vehicle'
-      ]
-    },
-    CII: {
-      link: 'https://docs.google.com/document/d/1d80MGZgtSYf_SgcMgeMEftMGWDyjKADRgF9LzWRYUjA/edit',
-      commonMistakes: [
-        'Incorrect following distance measurement',
-        'Not considering traffic conditions',
-        'Missing temporal aspects of following'
-      ],
-      keyPoints: [
-        'Measure exact following distance',
-        'Consider speed and road conditions',
-        'Duration of close following matters'
-      ]
-    },
-    DFCO: {
-      link: 'https://docs.google.com/document/d/1yC-QEreUhH-ag-bGJzbFBqn4NCB3Gc6vUuxzq1MA9M8/edit#heading=h.9nlts9t1on0a',
-      commonMistakes: [
-        'Confusing temporary obstructions with permanent ones',
-        'Not checking obstruction percentage',
-        'Missing partial obstructions'
-      ],
-      keyPoints: [
-        'Check if obstruction affects driver monitoring',
-        'Verify duration of obstruction',
-        'Consider lighting conditions'
-      ]
-    },
-    RFCO: {
-      link: 'https://docs.google.com/document/d/1yC-QEreUhH-ag-bGJzbFBqn4NCB3Gc6vUuxzq1MA9M8/edit#heading=h.9nlts9t1on0a',
-      commonMistakes: [
-        'Missing road visibility impact',
-        'Not considering weather effects',
-        'Incorrect obstruction classification'
-      ],
-      keyPoints: [
-        'Assess impact on road monitoring capability',
-        'Check for debris, weather, or equipment issues',
-        'Verify timing and duration'
-      ]
-    },
-    FCW: {
-      link: 'https://docs.google.com/document/d/1ZUj03wskvfrX-Kw-HLXBf49Q3VyWGgjF5oiCWjrfaNU/edit?pli=1#heading=h.w0gqyhyc8roy',
-      commonMistakes: [
-        'Not validating actual collision risk',
-        'Missing context of traffic situation',
-        'Incorrect timing assessment'
-      ],
-      keyPoints: [
-        'Verify genuine collision threat exists',
-        'Check vehicle closing speed',
-        'Consider driver reaction time available'
-      ]
-    },
-    Smoking: {
-      link: 'https://docs.google.com/document/d/1xvLo8PAsh2RVEnKGQPsAXsm_BNmwroWD4wHwiNw74-E/edit?tab=t.0',
-      commonMistakes: [
-        'Confusing smoking with other activities',
-        'Missing smoking gestures or paraphernalia',
-        'Not considering lighting conditions'
-      ],
-      keyPoints: [
-        'Look for cigarette, vaping device, or smoke',
-        'Check for smoking gestures and posture',
-        'Verify visibility and image quality'
-      ]
-    },
-    AD: {
-      link: 'https://docs.google.com/document/d/1kLxJ64XHmP9SOz5P_2dPT46jwRsC7LoSVkc3-OGQc_M/edit?tab=t.0#heading=h.yz6h9dvvgx74',
-      commonMistakes: [
-        'Not recognizing smooth acceleration patterns',
-        'Missing context of driving situation',
-        'Incorrect positive behavior identification'
-      ],
-      keyPoints: [
-        'Identify gradual, appropriate acceleration',
-        'Consider traffic flow and conditions',
-        'Verify driving behavior is genuinely positive'
-      ]
-    },
-    SD: {
-      link: 'https://docs.google.com/document/d/1kLxJ64XHmP9SOz5P_2dPT46jwRsC7LoSVkc3-OGQc_M/edit?tab=t.0#heading=h.yz6h9dvvgx74',
-      commonMistakes: [
-        'Not recognizing smooth deceleration',
-        'Missing anticipatory driving behaviors',
-        'Confusing with emergency braking'
-      ],
-      keyPoints: [
-        'Look for gradual, controlled deceleration',
-        'Check for anticipatory driving skills',
-        'Ensure behavior demonstrates good driving habits'
-      ]
-    },
-    
-    // Collision Tags
-    'C/PC': {
-      link: 'https://docs.google.com/document/d/1jb_q7nwT-Lradnk-yRZit4M7zP1wCB08/edit',
-      commonMistakes: [
-        'Incorrect severity classification',
-        'Missing collision vs near-miss distinction',
-        'Not assessing actual impact'
-      ],
-      keyPoints: [
-        'Determine if actual contact occurred',
-        'Assess severity level accurately',
-        'Consider all vehicles involved'
-      ]
-    },
-    'NC': {
-      link: 'https://docs.google.com/document/d/14vm7NXbF5iPN2celAhsWq2mNH2-dcdUE/edit',
-      commonMistakes: [
-        'Confusing with actual collisions',
-        'Not measuring proximity accurately',
-        'Missing evasive actions'
-      ],
-      keyPoints: [
-        'Verify no contact occurred',
-        'Measure minimum distance achieved',
-        'Check for evasive maneuvers'
-      ]
-    },
-    
-    // Other Tags
-    USP: {
-      link: 'https://docs.google.com/document/d/1f6PFmLnPn93FbulPaiM2yt1Omb4GF-S1_Uq_IAb4mP0/edit?tab=t.0',
-      commonMistakes: [
-        'Not considering parking location legality',
-        'Missing safety implications',
-        'Incorrect hazard assessment'
-      ],
-      keyPoints: [
-        'Check if parking creates hazard',
-        'Verify parking location regulations',
-        'Assess impact on traffic flow'
-      ]
-    },
-    Drowsiness: {
-      link: 'https://docs.google.com/document/d/10fCC27rJEwglkX-6Qy8nbKRDCjVeJDyq0mRS03ECj_o/edit',
-      commonMistakes: [
-        'Confusing drowsiness with other distractions',
-        'Not recognizing early drowsiness signs',
-        'Missing eye closure patterns'
-      ],
-      keyPoints: [
-        'Look for prolonged eye closures',
-        'Check for head nodding or drooping',
-        'Verify consistent drowsiness indicators'
-      ]
-    },
-    SBV: {
-      link: 'https://docs.google.com/document/d/1Ykcx3k-COnOG68Id6nPe-C4py2YgO2VqHeobboGpD6E/edit',
-      commonMistakes: [
-        'Not seeing seatbelt under clothing',
-        'Missing seatbelt adjustments',
-        'Incorrect visibility assessment'
-      ],
-      keyPoints: [
-        'Check entire visible area for seatbelt',
-        'Consider clothing and positioning',
-        'Verify clear view of driver area'
-      ]
-    },
-    CP: {
-      link: 'https://docs.google.com/document/d/1o1QmRPf-1Al7BpkfGjgrYva2lNHqnegg8jwEgEE3P5A/edit',
-      commonMistakes: [
-        'Missing hands-free usage',
-        'Not identifying phone vs other objects',
-        'Incorrect interaction assessment'
-      ],
-      keyPoints: [
-        'Identify phone clearly in hand',
-        'Check for active interaction',
-        'Distinguish from hands-free usage'
-      ]
-    },
-    CF: {
-      link: 'https://docs.google.com/document/d/1d80MGZgtSYf_SgcMgeMEftMGWDyjKADRgF9LzWRYUjA/edit',
-      commonMistakes: [
-        'Incorrect distance measurement',
-        'Not considering speed factors',
-        'Missing temporal aspects'
-      ],
-      keyPoints: [
-        'Measure following distance accurately',
-        'Consider vehicle speeds',
-        'Check duration of close following'
-      ]
-    },
-    SSV: {
-      link: 'https://docs.google.com/document/d/1bvoPlq355ssrIXzl-iNb6NwnVYr_enE6kPg002Sxt-s/edit',
-      commonMistakes: [
-        'Not identifying complete stops',
-        'Missing rolling stops',
-        'Incorrect stop line reference'
-      ],
-      keyPoints: [
-        'Vehicle must come to complete stop',
-        'Check position relative to stop line',
-        'Verify full stop duration'
-      ]
-    },
-    Distraction: {
-      link: 'https://docs.google.com/document/d/1VNIUsLEgVunRqwJPuVx-OgUJF4wVFopybf2b8zrTGG0/edit',
-      commonMistakes: [
-        'Not identifying distraction source',
-        'Missing duration of distraction',
-        'Confusing brief glances with distraction'
-      ],
-      keyPoints: [
-        'Identify specific distraction activity',
-        'Check duration and frequency',
-        'Assess impact on driving attention'
-      ]
-    },
-    ULC: {
-      link: 'https://docs.google.com/document/d/1QTLklxpsjHS5zcTEFC8xlCZONmLn-S6VGIHsXzjQY-U/edit',
-      commonMistakes: [
-        'Not checking blind spots',
-        'Missing signal usage',
-        'Incorrect safety gap assessment'
-      ],
-      keyPoints: [
-        'Verify adequate gap for lane change',
-        'Check for proper signaling',
-        'Assess impact on other vehicles'
-      ]
-    }
-  };
-
   const tagDescriptions = {
     RRL: 'Running a Red Light',
     LC: 'Lane Cutoff',
@@ -283,6 +27,28 @@ const QACalculator = () => {
     SSV: 'Stop Sign Violation',
     Distraction: 'Driver Distraction',
     ULC: 'Unsafe Lane Change'
+  };
+
+  const documentationLinks = {
+    RRL: 'https://docs.google.com/document/d/1qCMjFlso9fsXPkvXy_Z_FY6o_RK2OVvK_n3AKE4Y2mw/edit',
+    LC: 'https://docs.google.com/document/d/1g0xayDpV9CRdw_mXgTJ-zH9cJ2p7l9fAQT937KDDuCQ/edit',
+    CII: 'https://docs.google.com/document/d/1d80MGZgtSYf_SgcMgeMEftMGWDyjKADRgF9LzWRYUjA/edit',
+    DFCO: 'https://docs.google.com/document/d/1yC-QEreUhH-ag-bGJzbFBqn4NCB3Gc6vUuxzq1MA9M8/edit#heading=h.9nlts9t1on0a',
+    RFCO: 'https://docs.google.com/document/d/1yC-QEreUhH-ag-bGJzbFBqn4NCB3Gc6vUuxzq1MA9M8/edit#heading=h.9nlts9t1on0a',
+    FCW: 'https://docs.google.com/document/d/1ZUj03wskvfrX-Kw-HLXBf49Q3VyWGgjF5oiCWjrfaNU/edit?pli=1#heading=h.w0gqyhyc8roy',
+    Smoking: 'https://docs.google.com/document/d/1xvLo8PAsh2RVEnKGQPsAXsm_BNmwroWD4wHwiNw74-E/edit?tab=t.0',
+    AD: 'https://docs.google.com/document/d/1kLxJ64XHmP9SOz5P_2dPT46jwRsC7LoSVkc3-OGQc_M/edit?tab=t.0#heading=h.yz6h9dvvgx74',
+    SD: 'https://docs.google.com/document/d/1kLxJ64XHmP9SOz5P_2dPT46jwRsC7LoSVkc3-OGQc_M/edit?tab=t.0#heading=h.yz6h9dvvgx74',
+    'C/PC': 'https://docs.google.com/document/d/1jb_q7nwT-Lradnk-yRZit4M7zP1wCB08/edit',
+    'NC': 'https://docs.google.com/document/d/14vm7NXbF5iPN2celAhsWq2mNH2-dcdUE/edit',
+    USP: 'https://docs.google.com/document/d/1f6PFmLnPn93FbulPaiM2yt1Omb4GF-S1_Uq_IAb4mP0/edit?tab=t.0',
+    Drowsiness: 'https://docs.google.com/document/d/10fCC27rJEwglkX-6Qy8nbKRDCjVeJDyq0mRS03ECj_o/edit',
+    SBV: 'https://docs.google.com/document/d/1Ykcx3k-COnOG68Id6nPe-C4py2YgO2VqHeobboGpD6E/edit',
+    CP: 'https://docs.google.com/document/d/1o1QmRPf-1Al7BpkfGjgrYva2lNHqnegg8jwEgEE3P5A/edit',
+    CF: 'https://docs.google.com/document/d/1d80MGZgtSYf_SgcMgeMEftMGWDyjKADRgF9LzWRYUjA/edit',
+    SSV: 'https://docs.google.com/document/d/1bvoPlq355ssrIXzl-iNb6NwnVYr_enE6kPg002Sxt-s/edit',
+    Distraction: 'https://docs.google.com/document/d/1VNIUsLEgVunRqwJPuVx-OgUJF4wVFopybf2b8zrTGG0/edit',
+    ULC: 'https://docs.google.com/document/d/1QTLklxpsjHS5zcTEFC8xlCZONmLn-S6VGIHsXzjQY-U/edit'
   };
 
   const [newTags, setNewTags] = useState({
@@ -315,52 +81,53 @@ const QACalculator = () => {
 
   const results = useQACalculations(newTags, collisionTags, otherTags);
 
+  const categories = {
+    newTags: {
+      title: 'New Tags QA',
+      weightage: '20%',
+      icon: '🏷️',
+      data: newTags,
+      setState: setNewTags
+    },
+    collisionTags: {
+      title: 'Collision Tags QA',
+      weightage: '30%',
+      icon: '💥',
+      data: collisionTags,
+      setState: setCollisionTags
+    },
+    otherTags: {
+      title: 'Other Tags QA',
+      weightage: '50%',
+      icon: '📋',
+      data: otherTags,
+      setState: setOtherTags
+    }
+  };
+
   const handleInputChange = useCallback((category, tag, field, value) => {
     const numValue = Math.max(0, parseFloat(value) || 0);
     
-    const updateState = (setState) => {
-      setState(prev => ({
-        ...prev,
-        [tag]: { 
-          ...prev[tag], 
-          [field]: numValue 
-        }
-      }));
-    };
-
-    switch (category) {
-      case 'newTags':
-        updateState(setNewTags);
-        break;
-      case 'collisionTags':
-        updateState(setCollisionTags);
-        break;
-      case 'otherTags':
-        updateState(setOtherTags);
-        break;
-      default:
-        break;
-    }
-  }, []);
+    categories[category].setState(prev => ({
+      ...prev,
+      [tag]: { 
+        ...prev[tag], 
+        [field]: numValue 
+      }
+    }));
+  }, [categories]);
 
   const resetForm = useCallback(() => {
     const emptyData = { qaCount: 0, correctCount: 0, qaError: 0 };
     
-    setNewTags(Object.keys(newTags).reduce((acc, key) => {
-      acc[key] = { ...emptyData };
-      return acc;
-    }, {}));
-    
-    setCollisionTags(Object.keys(collisionTags).reduce((acc, key) => {
-      acc[key] = { ...emptyData };
-      return acc;
-    }, {}));
-    
-    setOtherTags(Object.keys(otherTags).reduce((acc, key) => {
-      acc[key] = { ...emptyData };
-      return acc;
-    }, {}));
-  }, [newTags, collisionTags, otherTags]);
+    Object.keys(categories).forEach(categoryKey => {
+      const category = categories[categoryKey];
+      category.setState(Object.keys(category.data).reduce((acc, key) => {
+        acc[key] = { ...emptyData };
+        return acc;
+      }, {}));
+    });
+  }, [categories]);
 
   const getScoreGrade = (score) => {
     if (score >= 90) return 'Excellent';
@@ -371,327 +138,553 @@ const QACalculator = () => {
   };
 
   const getPerformanceColor = (accuracy) => {
-    if (accuracy >= 95) return '#22c55e'; // Green
-    if (accuracy >= 85) return '#3b82f6'; // Blue
-    if (accuracy >= 70) return '#f59e0b'; // Amber
-    if (accuracy >= 60) return '#f97316'; // Orange
-    return '#ef4444'; // Red
+    if (accuracy >= 95) return '#22c55e';
+    if (accuracy >= 85) return '#3b82f6';
+    if (accuracy >= 70) return '#f59e0b';
+    if (accuracy >= 60) return '#f97316';
+    return '#ef4444';
   };
 
   const openDocumentation = (tag) => {
-    const link = tagDocumentation[tag]?.link;
+    const link = documentationLinks[tag];
     if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     }
   };
 
-  const handleTagSelect = (tag, category) => {
-    setSelectedTag({ tag, category });
+  const getCurrentCategoryData = () => {
+    return categories[activeCategory].data;
   };
 
-  const renderTagButtons = (tags, category, title, weightage) => (
-    <div className="tag-section">
-      <div className="section-header">
-        <h3>{title}</h3>
-        <span className="weightage-badge">{weightage} Weight</span>
-      </div>
-      <div className="tag-buttons-grid">
-        {Object.entries(tags).map(([tag, data]) => {
-          const accuracy = data.qaCount > 0 ? ((data.correctCount + data.qaError) / data.qaCount) * 100 : 0;
-          const hasData = data.qaCount > 0;
-          
-          return (
-            <div key={tag} className="tag-button-container">
-              <button 
-                className={`tag-button ${selectedTag?.tag === tag ? 'active' : ''} ${hasData ? 'has-data' : ''}`}
-                onClick={() => handleTagSelect(tag, category)}
-                style={hasData ? { borderColor: getPerformanceColor(accuracy) } : {}}
+  // Enhanced AI Insights Component
+  const EnhancedInsightsPanel = ({ insights, tagAnalysis, openDocumentation }) => {
+    const [activeInsight, setActiveInsight] = useState('all');
+    const [expandedCards, setExpandedCards] = useState(new Set());
+
+    const toggleCard = (index) => {
+      const newExpanded = new Set(expandedCards);
+      if (newExpanded.has(index)) {
+        newExpanded.delete(index);
+      } else {
+        newExpanded.add(index);
+      }
+      setExpandedCards(newExpanded);
+    };
+
+    const insightCategories = {
+      all: { title: 'All Insights', icon: '🎯', color: '#3b82f6' },
+      critical: { title: 'Critical Issues', icon: '🔴', color: '#ef4444' },
+      warning: { title: 'Needs Improvement', icon: '🟡', color: '#f59e0b' },
+      success: { title: 'Excellent Work', icon: '🟢', color: '#22c55e' },
+      recommendations: { title: 'Smart Tips', icon: '💡', color: '#8b5cf6' }
+    };
+
+    const getDetailedInsights = () => {
+      const detailedInsights = [];
+
+      // Critical performance issues (accuracy < 70%)
+      const criticalTags = tagAnalysis.filter(tag => tag.accuracy < 70 && tag.qaCount > 0);
+      criticalTags.forEach(tag => {
+        detailedInsights.push({
+          type: 'critical',
+          priority: 'high',
+          tag: tag.tag,
+          title: `Critical: ${tag.tag} Performance Alert`,
+          message: `Your ${tag.tag} accuracy is only ${tag.accuracy.toFixed(1)}%. This significantly impacts your overall score.`,
+          recommendation: `Immediate action required. Review ${tag.tag} documentation and practice with examples.`,
+          impact: `Costing you ${(85 - tag.accuracy).toFixed(1)} percentage points`,
+          timeToImprove: '1-2 weeks with focused practice',
+          actionItems: [
+            `Study ${tag.tag} evaluation criteria`,
+            'Practice with sample events',
+            'Focus on common mistake patterns',
+            'Review edge cases and exceptions'
+          ]
+        });
+      });
+
+      // Performance improvement needed (70-85% accuracy)
+      const improvementTags = tagAnalysis.filter(tag => tag.accuracy >= 70 && tag.accuracy < 85 && tag.qaCount > 0);
+      improvementTags.forEach(tag => {
+        detailedInsights.push({
+          type: 'warning',
+          priority: 'medium',
+          tag: tag.tag,
+          title: `Improve ${tag.tag} Consistency`,
+          message: `${tag.tag} accuracy is ${tag.accuracy.toFixed(1)}%. You're close to the target of 85%+.`,
+          recommendation: `Focus on edge cases and review documentation for subtle criteria differences.`,
+          impact: `Potential gain of ${(90 - tag.accuracy).toFixed(1)} percentage points`,
+          timeToImprove: '3-5 days of focused review',
+          actionItems: [
+            'Review missed cases from recent evaluations',
+            'Study borderline examples',
+            'Practice with challenging scenarios',
+            'Double-check evaluation criteria'
+          ]
+        });
+      });
+
+      // Excellent performance recognition (95%+ accuracy)
+      const excellentTags = tagAnalysis.filter(tag => tag.accuracy >= 95 && tag.qaCount > 0);
+      if (excellentTags.length > 0) {
+        detailedInsights.push({
+          type: 'success',
+          priority: 'low',
+          title: 'Outstanding Performance!',
+          message: `Excellent work on ${excellentTags.map(t => t.tag).join(', ')}! Your accuracy is consistently above 95%.`,
+          recommendation: 'Maintain your current approach and help others learn from your expertise.',
+          impact: 'Contributing significantly to overall score',
+          timeToImprove: 'Already at target level',
+          actionItems: [
+            'Share knowledge with team members',
+            'Document your evaluation approach',
+            'Mentor others on these tag types',
+            'Stay updated with guideline changes'
+          ]
+        });
+      }
+
+      // Smart recommendations based on patterns
+      const tagCounts = tagAnalysis.filter(tag => tag.qaCount > 0);
+      if (tagCounts.length < 5) {
+        detailedInsights.push({
+          type: 'info',
+          priority: 'medium',
+          title: 'Increase Evaluation Diversity',
+          message: `You've only evaluated ${tagCounts.length} different tag types. Diversify your practice.`,
+          recommendation: 'Practice with different event types to build comprehensive skills.',
+          impact: 'Improved overall evaluation capabilities',
+          timeToImprove: '1-2 weeks',
+          actionItems: [
+            'Try evaluating different tag categories',
+            'Focus on less familiar event types',
+            'Build confidence across all areas',
+            'Request varied practice materials'
+          ]
+        });
+      }
+
+      // Overall performance pattern analysis
+      const overallAccuracy = tagAnalysis.length > 0 ? 
+        tagAnalysis.reduce((sum, tag) => sum + tag.accuracy, 0) / tagAnalysis.length : 0;
+      
+      if (overallAccuracy > 0 && overallAccuracy < 75) {
+        detailedInsights.push({
+          type: 'warning',
+          priority: 'high',
+          title: 'Overall Performance Improvement Needed',
+          message: `Your average accuracy across all tags is ${overallAccuracy.toFixed(1)}%. Focus on systematic improvement.`,
+          recommendation: 'Create a structured study plan focusing on your lowest-performing areas first.',
+          impact: 'Significant potential for score improvement',
+          timeToImprove: '2-4 weeks with consistent practice',
+          actionItems: [
+            'Identify and prioritize weakest areas',
+            'Set daily practice goals',
+            'Track improvement progress',
+            'Seek mentorship or additional training'
+          ]
+        });
+      }
+
+      return detailedInsights;
+    };
+
+    const detailedInsights = getDetailedInsights();
+    
+    const filteredInsights = activeInsight === 'all' 
+      ? detailedInsights 
+      : detailedInsights.filter(insight => {
+          if (activeInsight === 'recommendations') return insight.type === 'info';
+          return insight.type === activeInsight;
+        });
+
+    const getInsightIcon = (type, priority) => {
+      const icons = {
+        critical: '🚨',
+        warning: '⚠️',
+        success: '🎉',
+        info: '💡'
+      };
+      return icons[type] || '📋';
+    };
+
+    const getPriorityColor = (priority) => {
+      const colors = {
+        high: '#ef4444',
+        medium: '#f59e0b',
+        low: '#22c55e'
+      };
+      return colors[priority] || '#6b7280';
+    };
+
+    return (
+      <div className="enhanced-insights-panel">
+        <div className="insights-header">
+          <h3>🤖 AI Performance Coach</h3>
+          <p>Personalized recommendations based on your performance data</p>
+        </div>
+
+        {/* Category Filters */}
+        <div className="insight-categories">
+          {Object.entries(insightCategories).map(([key, category]) => {
+            const count = key === 'all' ? detailedInsights.length : 
+              key === 'recommendations' ? detailedInsights.filter(i => i.type === 'info').length :
+              detailedInsights.filter(i => i.type === key).length;
+            
+            return (
+              <button
+                key={key}
+                className={`category-filter ${activeInsight === key ? 'active' : ''}`}
+                onClick={() => setActiveInsight(key)}
+                style={{ '--category-color': category.color }}
               >
-                <div className="tag-info">
-                  <h4>{tag}</h4>
-                  <p className="tag-description">{tagDescriptions[tag]}</p>
-                  <div className="tag-stats">
-                    <span className="qa-count">QA: {data.qaCount}</span>
-                    <span 
-                      className="accuracy"
-                      style={hasData ? { color: getPerformanceColor(accuracy) } : {}}
-                    >
-                      {hasData ? `${accuracy.toFixed(1)}%` : 'N/A'}
-                    </span>
-                  </div>
-                  {hasData && accuracy < 80 && (
-                    <div className="performance-warning">⚠️ Needs Attention</div>
-                  )}
-                </div>
-                <div className="tag-actions">
-                  <button 
-                    className="doc-button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openDocumentation(tag);
-                    }}
-                    title="View Documentation"
-                  >
-                    📖
-                  </button>
+                <span className="category-icon">{category.icon}</span>
+                <div className="category-info">
+                  <span className="category-title">{category.title}</span>
+                  <span className="category-count">{count}</span>
                 </div>
               </button>
+            );
+          })}
+        </div>
+
+        {/* Insights Content */}
+        <div className="insights-content">
+          {filteredInsights.length === 0 ? (
+            <div className="no-insights">
+              <div className="no-insights-icon">🎯</div>
+              <h4>No insights available</h4>
+              <p>Add more QA data to get personalized recommendations.</p>
             </div>
-          );
-        })}
+          ) : (
+            <div className="insights-grid">
+              {filteredInsights.map((insight, index) => (
+                <div 
+                  key={index} 
+                  className={`insight-card enhanced ${insight.type} ${expandedCards.has(index) ? 'expanded' : ''}`}
+                >
+                  <div className="insight-card-header">
+                    <div className="insight-meta">
+                      <span className="insight-icon">
+                        {getInsightIcon(insight.type, insight.priority)}
+                      </span>
+                      <div className="insight-title-area">
+                        <h4>{insight.title}</h4>
+                        <span 
+                          className="priority-badge"
+                          style={{ backgroundColor: getPriorityColor(insight.priority) }}
+                        >
+                          {insight.priority} priority
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      className="expand-toggle"
+                      onClick={() => toggleCard(index)}
+                    >
+                      {expandedCards.has(index) ? '⌃' : '⌄'}
+                    </button>
+                  </div>
+
+                  <div className="insight-content">
+                    <p className="insight-message">{insight.message}</p>
+                    
+                    {insight.impact && (
+                      <div className="insight-impact">
+                        <span className="impact-label">📊 Impact:</span>
+                        <span className="impact-value">{insight.impact}</span>
+                      </div>
+                    )}
+
+                    <div className={`insight-details ${expandedCards.has(index) ? 'visible' : ''}`}>
+                      {insight.recommendation && (
+                        <div className="recommendation-section">
+                          <h5>💡 Recommendation:</h5>
+                          <p>{insight.recommendation}</p>
+                        </div>
+                      )}
+
+                      {insight.timeToImprove && (
+                        <div className="timeline-section">
+                          <span className="timeline-icon">⏱️</span>
+                          <span className="timeline-text">Expected improvement time: {insight.timeToImprove}</span>
+                        </div>
+                      )}
+
+                      {insight.actionItems && (
+                        <div className="action-items-section">
+                          <h5>✅ Action Items:</h5>
+                          <ul className="action-items-list">
+                            {insight.actionItems.map((item, itemIndex) => (
+                              <li key={itemIndex}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="insight-actions">
+                    {insight.tag && (
+                      <button
+                        className="action-button primary"
+                        onClick={() => openDocumentation(insight.tag)}
+                      >
+                        📖 Study {insight.tag} Guide
+                      </button>
+                    )}
+                    <button
+                      className="action-button secondary"
+                      onClick={() => toggleCard(index)}
+                    >
+                      {expandedCards.has(index) ? 'Show Less' : 'Show More'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Performance Summary */}
+        {detailedInsights.length > 0 && (
+          <div className="performance-summary">
+            <h4>📈 Performance Summary</h4>
+            <div className="summary-stats">
+              <div className="summary-stat critical">
+                <span className="stat-number">{detailedInsights.filter(i => i.type === 'critical').length}</span>
+                <span className="stat-label">Critical Issues</span>
+              </div>
+              <div className="summary-stat warning">
+                <span className="stat-number">{detailedInsights.filter(i => i.type === 'warning').length}</span>
+                <span className="stat-label">Need Improvement</span>
+              </div>
+              <div className="summary-stat success">
+                <span className="stat-number">{detailedInsights.filter(i => i.type === 'success').length}</span>
+                <span className="stat-label">Excellent Areas</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-      
-      {selectedTag && selectedTag.category === category && (
-        <div className="tag-input-form">
-          <h4>Enter data for: {selectedTag.tag} - {tagDescriptions[selectedTag.tag]}</h4>
-          <div className="input-form-grid">
-            <div className="input-field">
+    );
+  };
+
+  const renderTagCard = (tag, data) => {
+    const accuracy = data.qaCount > 0 ? ((data.correctCount + data.qaError) / data.qaCount) * 100 : 0;
+    const hasData = data.qaCount > 0;
+    
+    return (
+      <div key={tag} className={`tag-card ${selectedTag === tag ? 'selected' : ''} ${hasData ? 'has-data' : ''}`}>
+        <div className="tag-card-header">
+          <div className="tag-info">
+            <h4>{tag}</h4>
+            <p className="tag-description">{tagDescriptions[tag]}</p>
+          </div>
+          <div className="tag-status">
+            {hasData ? (
+              <div className="accuracy-display" style={{ color: getPerformanceColor(accuracy) }}>
+                {accuracy.toFixed(1)}%
+              </div>
+            ) : (
+              <div className="no-data">No Data</div>
+            )}
+          </div>
+        </div>
+        
+        <div className="tag-card-body">
+          <div className="input-row">
+            <div className="input-group">
               <label>QA Count</label>
               <input
                 type="number"
                 min="0"
-                value={tags[selectedTag.tag].qaCount}
-                onChange={(e) => handleInputChange(category, selectedTag.tag, 'qaCount', e.target.value)}
+                value={data.qaCount}
+                onChange={(e) => handleInputChange(activeCategory, tag, 'qaCount', e.target.value)}
+                className="compact-input"
               />
             </div>
-            <div className="input-field">
-              <label>Correct Count</label>
+            <div className="input-group">
+              <label>Correct</label>
               <input
                 type="number"
                 min="0"
-                max={tags[selectedTag.tag].qaCount}
-                value={tags[selectedTag.tag].correctCount}
-                onChange={(e) => handleInputChange(category, selectedTag.tag, 'correctCount', e.target.value)}
+                max={data.qaCount}
+                value={data.correctCount}
+                onChange={(e) => handleInputChange(activeCategory, tag, 'correctCount', e.target.value)}
+                className="compact-input"
               />
             </div>
-            <div className="input-field">
+            <div className="input-group">
               <label>QA Error</label>
               <input
                 type="number"
                 min="0"
-                value={tags[selectedTag.tag].qaError}
-                onChange={(e) => handleInputChange(category, selectedTag.tag, 'qaError', e.target.value)}
+                value={data.qaError}
+                onChange={(e) => handleInputChange(activeCategory, tag, 'qaError', e.target.value)}
+                className="compact-input"
               />
             </div>
           </div>
           
-          {/* Smart Recommendations */}
-          {tagDocumentation[selectedTag.tag] && (
-            <div className="smart-recommendations">
-              <h5>📋 Common Mistakes to Avoid:</h5>
-              <ul>
-                {tagDocumentation[selectedTag.tag].commonMistakes.map((mistake, index) => (
-                  <li key={index}>{mistake}</li>
-                ))}
-              </ul>
-              
-              <h5>🎯 Key Points to Remember:</h5>
-              <ul>
-                {tagDocumentation[selectedTag.tag].keyPoints.map((point, index) => (
-                  <li key={index}>{point}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          
-          <div className="form-actions">
+          <div className="tag-actions">
             <button 
-              className="doc-link-button"
-              onClick={() => openDocumentation(selectedTag.tag)}
+              className="doc-button"
+              onClick={() => openDocumentation(tag)}
+              title="View Documentation"
             >
-              📖 View Complete Documentation
+              📖 Guide
             </button>
-            <button 
-              className="close-form-button"
-              onClick={() => setSelectedTag(null)}
-            >
-              ✓ Done
-            </button>
+            {hasData && accuracy < 80 && (
+              <span className="improvement-badge">⚠️ Needs Focus</span>
+            )}
           </div>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
+  };
 
   return (
-    <div className="qa-calculator">
+    <div className="qa-calculator modern">
       <div className="calculator-header">
         <div className="header-left">
-          <h2>QA Score Calculator</h2>
-          <p>AI-powered insights and recommendations based on your performance</p>
+          <h2>🎯 QA Score Calculator</h2>
+          <p>Smart performance tracking with AI-powered insights</p>
         </div>
         
         <div className="header-controls">
           <div className="calculation-type">
-            <div className="radio-group">
-              <label className={`radio-label ${calculationType === 'weekly' ? 'active' : ''}`}>
-                <input
-                  type="radio"
-                  value="weekly"
-                  checked={calculationType === 'weekly'}
-                  onChange={(e) => setCalculationType(e.target.value)}
-                />
-                <span className="radio-custom"></span>
-                Weekly
-              </label>
-              <label className={`radio-label ${calculationType === 'monthly' ? 'active' : ''}`}>
-                <input
-                  type="radio"
-                  value="monthly"
-                  checked={calculationType === 'monthly'}
-                  onChange={(e) => setCalculationType(e.target.value)}
-                />
-                <span className="radio-custom"></span>
-                Monthly
-              </label>
+            <div className="toggle-switch">
+              <input
+                type="radio"
+                id="weekly"
+                value="weekly"
+                checked={calculationType === 'weekly'}
+                onChange={(e) => setCalculationType(e.target.value)}
+              />
+              <label htmlFor="weekly">Weekly</label>
+              <input
+                type="radio"
+                id="monthly"
+                value="monthly"
+                checked={calculationType === 'monthly'}
+                onChange={(e) => setCalculationType(e.target.value)}
+              />
+              <label htmlFor="monthly">Monthly</label>
+              <div className="toggle-slider"></div>
             </div>
           </div>
-          <button className="reset-btn" onClick={resetForm}>
-            <span>🔄</span>
-            Reset All
+          <button className="action-button reset" onClick={resetForm}>
+            🔄 Reset All
           </button>
         </div>
       </div>
 
-      <div className="calculator-content">
-        <div className="inputs-section">
-          {renderTagButtons(newTags, 'newTags', 'New Tags QA', '20%')}
-          {renderTagButtons(collisionTags, 'collisionTags', 'Collision Tags QA', '30%')}
-          {renderTagButtons(otherTags, 'otherTags', 'Other Tags QA', '50%')}
+      <div className="calculator-layout">
+        <div className="main-panel">
+          {/* Category Navigation */}
+          <div className="category-nav">
+            {Object.entries(categories).map(([key, category]) => (
+              <button
+                key={key}
+                className={`category-tab ${activeCategory === key ? 'active' : ''}`}
+                onClick={() => setActiveCategory(key)}
+              >
+                <span className="category-icon">{category.icon}</span>
+                <div className="category-details">
+                  <span className="category-title">{category.title}</span>
+                  <span className="category-weight">{category.weightage}</span>
+                </div>
+                <div className="category-indicator"></div>
+              </button>
+            ))}
+          </div>
+
+          {/* Tag Cards Grid */}
+          <div className="tags-container">
+            <div className="container-header">
+              <h3>{categories[activeCategory].title}</h3>
+              <span className="tag-count">
+                {Object.keys(getCurrentCategoryData()).length} tags
+              </span>
+            </div>
+            
+            <div className="tags-grid">
+              {Object.entries(getCurrentCategoryData()).map(([tag, data]) => 
+                renderTagCard(tag, data)
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="results-section">
-          <div className="results-card">
-            <h3>Performance Analysis</h3>
-            
-            <div className="score-overview">
-              <div className="overall-score">
-                <div className="score-circle">
-                  <div className="score-value">{results.overallScore.toFixed(1)}%</div>
-                  <div className="score-grade">{getScoreGrade(results.overallScore)}</div>
-                </div>
-              </div>
-              
-              <div className="score-breakdown">
-                <div className="score-item">
-                  <div className="score-label">New Tags</div>
-                  <div className="score-bar">
-                    <div 
-                      className="score-fill new-tags" 
-                      style={{width: `${Math.min((results.newTagsScore / 20) * 100, 100)}%`}}
-                    ></div>
-                  </div>
-                  <div className="score-text">{results.newTagsScore.toFixed(1)}/20%</div>
-                </div>
-                
-                <div className="score-item">
-                  <div className="score-label">Collision Tags</div>
-                  <div className="score-bar">
-                    <div 
-                      className="score-fill collision" 
-                      style={{width: `${Math.min((results.collisionScore / 30) * 100, 100)}%`}}
-                    ></div>
-                  </div>
-                  <div className="score-text">{results.collisionScore.toFixed(1)}/30%</div>
-                </div>
-                
-                <div className="score-item">
-                  <div className="score-label">Other Tags</div>
-                  <div className="score-bar">
-                    <div 
-                      className="score-fill other-tags" 
-                      style={{width: `${Math.min((results.otherTagsScore / 50) * 100, 100)}%`}}
-                    ></div>
-                  </div>
-                  <div className="score-text">{results.otherTagsScore.toFixed(1)}/50%</div>
-                </div>
+        <div className="sidebar-panel">
+          <div className="score-display">
+            <div className="overall-score">
+              <div className="score-circle">
+                <div className="score-value">{results.overallScore.toFixed(1)}%</div>
+                <div className="score-label">{getScoreGrade(results.overallScore)}</div>
               </div>
             </div>
-
-            {/* Intelligent Insights */}
-            {results.insights && results.insights.length > 0 && (
-              <div className="intelligent-insights">
-                <h4>🤖 AI-Powered Insights</h4>
-                <div className="insights-list">
-                  {results.insights.slice(0, 3).map((insight, index) => (
-                    <div key={index} className={`insight ${insight.type}`}>
-                      <div className="insight-header">
-                        <h5>{insight.title}</h5>
-                        <span className={`priority-badge ${insight.priority}`}>
-                          {insight.priority === 'high' ? '🔴' : insight.priority === 'medium' ? '🟡' : '🟢'}
-                        </span>
-                      </div>
-                      <p className="insight-message">{insight.message}</p>
-                      <p className="insight-recommendation">
-                        <strong>💡 Recommendation:</strong> {insight.recommendation}
-                      </p>
-                      {insight.tag && (
-                        <button
-                          className="insight-action"
-                          onClick={() => openDocumentation(insight.tag)}
-                        >
-                          📖 Study {insight.tag} Guidelines
-                        </button>
-                      )}
-                    </div>
-                  ))}
+            
+            <div className="score-breakdown">
+              <div className="breakdown-item">
+                <span className="breakdown-label">🏷️ New Tags</span>
+                <div className="breakdown-bar">
+                  <div 
+                    className="breakdown-fill" 
+                    style={{width: `${Math.min((results.newTagsScore / 20) * 100, 100)}%`}}
+                  ></div>
                 </div>
+                <span className="breakdown-value">{results.newTagsScore.toFixed(1)}/20</span>
               </div>
-            )}
-
-            {/* Performance Analysis Table */}
-            {results.tagAnalysis && results.tagAnalysis.length > 0 && (
-              <div className="performance-analysis">
-                <div className="analysis-header">
-                  <h4>📊 Detailed Performance Analysis</h4>
-                  <button 
-                    className="toggle-details"
-                    onClick={() => setShowDetailedInsights(!showDetailedInsights)}
-                  >
-                    {showDetailedInsights ? '📄 Hide Details' : '📈 Show Details'}
-                  </button>
+              
+              <div className="breakdown-item">
+                <span className="breakdown-label">💥 Collisions</span>
+                <div className="breakdown-bar">
+                  <div 
+                    className="breakdown-fill" 
+                    style={{width: `${Math.min((results.collisionScore / 30) * 100, 100)}%`}}
+                  ></div>
                 </div>
-                
-                {showDetailedInsights && (
-                  <div className="analysis-table">
-                    <div className="table-header">
-                      <div>Tag</div>
-                      <div>Accuracy</div>
-                      <div>QA Count</div>
-                      <div>Status</div>
-                      <div>Action</div>
-                    </div>
-                    {results.tagAnalysis.map((tag, index) => (
-                      <div key={index} className="table-row">
-                        <div className="tag-name">{tag.tag}</div>
-                        <div 
-                          className="accuracy-cell"
-                          style={{ color: getPerformanceColor(tag.accuracy) }}
-                        >
-                          {tag.accuracy.toFixed(1)}%
-                        </div>
-                        <div>{tag.qaCount}</div>
-                        <div className={`status ${tag.performanceLevel}`}>
-                          {tag.isLagging ? '🔴 Critical' : 
-                           tag.needsImprovement ? '🟡 Improve' : '🟢 Good'}
-                        </div>
-                        <div>
-                          <button
-                            className="study-button"
-                            onClick={() => openDocumentation(tag.tag)}
-                          >
-                            📚 Study
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <span className="breakdown-value">{results.collisionScore.toFixed(1)}/30</span>
               </div>
-            )}
+              
+              <div className="breakdown-item">
+                <span className="breakdown-label">📋 Other Tags</span>
+                <div className="breakdown-bar">
+                  <div 
+                    className="breakdown-fill" 
+                    style={{width: `${Math.min((results.otherTagsScore / 50) * 100, 100)}%`}}
+                  ></div>
+                </div>
+                <span className="breakdown-value">{results.otherTagsScore.toFixed(1)}/50</span>
+              </div>
+            </div>
+          </div>
 
-            <div className="documentation-note">
-              <p>💡 <strong>Pro Tip:</strong> Tags with accuracy below 80% are highlighted. Click 📖 for detailed guidelines and common mistake patterns.</p>
+          {/* Enhanced AI Insights */}
+          {results.insights && results.tagAnalysis && (
+            <EnhancedInsightsPanel 
+              insights={results.insights}
+              tagAnalysis={results.tagAnalysis}
+              openDocumentation={openDocumentation}
+            />
+          )}
+
+          <div className="quick-stats">
+            <div className="stat-item">
+              <span className="stat-number">
+                {Object.values({...newTags, ...collisionTags, ...otherTags})
+                  .filter(tag => tag.qaCount > 0).length}
+              </span>
+              <span className="stat-label">Tags with Data</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-number">
+                {Object.values({...newTags, ...collisionTags, ...otherTags})
+                  .reduce((sum, tag) => sum + tag.qaCount, 0)}
+              </span>
+              <span className="stat-label">Total QA Count</span>
             </div>
           </div>
         </div>
