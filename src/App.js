@@ -3,10 +3,24 @@ import { ThemeProvider } from './context/ThemeContext';
 import Header from './components/Header';
 import QACalculator from './components/QACalculator';
 import SalaryCalculator from './components/SalaryCalculator';
+import GuidelinesPanel from './components/GuidelinesPanel';
 import './App.css';
 
 function App() {
   const [activeTab, setActiveTab] = useState('qa');
+
+  const renderActiveComponent = () => {
+    switch (activeTab) {
+      case 'qa':
+        return <QACalculator />;
+      case 'salary':
+        return <SalaryCalculator />;
+      case 'guidelines':
+        return <GuidelinesPanel />;
+      default:
+        return <QACalculator />;
+    }
+  };
 
   return (
     <ThemeProvider>
@@ -14,7 +28,7 @@ function App() {
         <Header activeTab={activeTab} setActiveTab={setActiveTab} />
         
         <main className="main-content" id="main-content">
-          {activeTab === 'qa' ? <QACalculator /> : <SalaryCalculator />}
+          {renderActiveComponent()}
         </main>
 
         <footer className="app-footer">

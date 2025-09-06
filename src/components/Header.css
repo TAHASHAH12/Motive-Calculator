@@ -43,7 +43,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* Updated logo styling */
 .logo-image {
   width: 40px;
   height: 40px;
@@ -52,7 +51,6 @@
   filter: var(--logo-filter);
 }
 
-/* Logo filter for theme switching */
 .light-theme .logo-image {
   --logo-filter: none;
 }
@@ -187,6 +185,22 @@
   .logo-image {
     width: 32px;
     height: 32px;
+  }
+  
+  .tab-navigation {
+    gap: 0.5rem;
+  }
+}
+
+/* 3-tab specific styles */
+@media (min-width: 769px) {
+  .tab-navigation {
+    gap: 0.5rem;
+  }
+  
+  .tab-button {
+    min-width: 110px;
+    font-size: 0.85rem;
   }
 }
 

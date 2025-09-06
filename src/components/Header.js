@@ -39,6 +39,14 @@ const Header = ({ activeTab, setActiveTab }) => {
               <span className="tab-icon">💰</span>
               <span>Salary Calculator</span>
             </button>
+            <button 
+              className={`tab-button ${activeTab === 'guidelines' ? 'active' : ''}`}
+              onClick={() => setActiveTab('guidelines')}
+              aria-pressed={activeTab === 'guidelines'}
+            >
+              <span className="tab-icon">📚</span>
+              <span>Guidelines</span>
+            </button>
           </nav>
           
           <ThemeToggle />
