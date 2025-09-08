@@ -16,7 +16,7 @@ const Header = ({ activeTab, setActiveTab }) => {
               alt="Motive Logo" 
               className="logo-image"
             />
-            <span className="brand-name">Motive</span>
+            <span className="brand-name">Annotations</span>
           </div>
           <h1>Employee Performance & Salary Calculator</h1>
         </div>
