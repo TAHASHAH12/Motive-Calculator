@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
@@ -11,36 +11,21 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    try {
-      const savedTheme = localStorage.getItem('motive-theme');
-      return savedTheme ? JSON.parse(savedTheme) : false;
-    } catch (error) {
-      return false;
-    }
-  });
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('motive-theme', JSON.stringify(isDarkMode));
-    } catch (error) {
-      console.warn('Could not save theme to localStorage');
+    const savedTheme = localStorage.getItem('motive-theme');
+    if (savedTheme) {
+      setIsDarkMode(savedTheme === 'dark');
+    } else {
+      // Check system preference
+      setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
-    
-    const themeClass = isDarkMode ? 'dark-theme' : 'light-theme';
-    
-    document.documentElement.className = themeClass;
-    document.body.className = themeClass;
+  }, []);
+
+  useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-    
-    document.body.style.display = 'none';
-    const height = document.body.offsetHeight;
-    document.body.style.display = '';
-    
-    if (height >= 0) {
-      console.log('Theme applied successfully');
-    }
-    
+    localStorage.setItem('motive-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
   const toggleTheme = () => {

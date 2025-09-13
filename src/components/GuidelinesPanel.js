@@ -1,11 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Search, AlertTriangle, TrendingDown, BookOpen } from 'lucide-react';
 import './GuidelinesPanel.css';
 
-const GuidelinesPanel = () => {
-  const [selectedCategory, setSelectedCategory] = useState('road-facing');
+const GuidelinesPanel = ({ data, userInfo }) => {
+  const [selectedCategory, setSelectedCategory] = useState('recommended');
   const [searchTerm, setSearchTerm] = useState('');
+  const [performanceBasedRecs, setPerformanceBasedRecs] = useState([]);
+
+  const generatePerformanceBasedRecommendations = useCallback(() => {
+    if (!data || !data.qaData || data.qaData.length === 0) {
+      setPerformanceBasedRecs([]);
+      return;
+    }
+
+    const latestQA = data.qaData[data.qaData.length - 1];
+    const recommendations = [];
+
+    // Analyze performance and recommend specific documentation
+    if (latestQA.rrlAccuracy < 95) {
+      recommendations.push({
+        tag: 'RRL',
+        priority: 'high',
+        reason: `RRL accuracy is ${latestQA.rrlAccuracy.toFixed(1)}% - needs improvement`,
+        gap: (95 - latestQA.rrlAccuracy).toFixed(1)
+      });
+    }
+
+    if (latestQA.smokingAccuracy < 90) {
+      recommendations.push({
+        tag: 'Smoking',
+        priority: 'high',
+        reason: `Smoking detection accuracy is ${latestQA.smokingAccuracy.toFixed(1)}% - focus needed`,
+        gap: (90 - latestQA.smokingAccuracy).toFixed(1)
+      });
+    }
+
+    if (latestQA.laneAccuracy < 95) {
+      recommendations.push({
+        tag: 'LC',
+        priority: 'medium',
+        reason: `Lane Cutoff accuracy is ${latestQA.laneAccuracy.toFixed(1)}% - review needed`,
+        gap: (95 - latestQA.laneAccuracy).toFixed(1)
+      });
+    }
+
+    if (latestQA.fcwAccuracy < 90) {
+      recommendations.push({
+        tag: 'FCW',
+        priority: 'medium',
+        reason: `FCW accuracy is ${latestQA.fcwAccuracy.toFixed(1)}% - improvement possible`,
+        gap: (90 - latestQA.fcwAccuracy).toFixed(1)
+      });
+    }
+
+    if (latestQA.collisionAccuracy < 95) {
+      recommendations.push({
+        tag: 'C/PC',
+        priority: 'high',
+        reason: `Collision accuracy is ${latestQA.collisionAccuracy.toFixed(1)}% - critical for score`,
+        gap: (95 - latestQA.collisionAccuracy).toFixed(1)
+      });
+    }
+
+    if (latestQA.nearCollisionAccuracy < 90) {
+      recommendations.push({
+        tag: 'NC',
+        priority: 'medium',
+        reason: `Near Collision accuracy is ${latestQA.nearCollisionAccuracy.toFixed(1)}% - review criteria`,
+        gap: (90 - latestQA.nearCollisionAccuracy).toFixed(1)
+      });
+    }
+
+    // Sort by priority and gap
+    recommendations.sort((a, b) => {
+      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      if (priorityOrder[b.priority] !== priorityOrder[a.priority]) {
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      }
+      return parseFloat(b.gap) - parseFloat(a.gap);
+    });
+
+    setPerformanceBasedRecs(recommendations);
+  }, [data]);
+
+  useEffect(() => {
+    generatePerformanceBasedRecommendations();
+  }, [generatePerformanceBasedRecommendations]);
 
   const documentationData = {
+    'recommended': {
+      title: 'Recommended for You',
+      description: 'Documentation recommended based on your performance gaps',
+      icon: '🎯',
+      documents: []
+    },
     'road-facing': {
       title: 'Road Facing Events',
       description: 'Documentation for road-facing camera events and AI detections',
@@ -123,70 +211,6 @@ const GuidelinesPanel = () => {
             'Missing context of traffic situation',
             'Incorrect timing assessment',
             'Not considering system sensitivity'
-          ]
-        },
-        {
-          id: 'near-collision',
-          title: 'Near Collision (NC)',
-          description: 'Near collision event identification and severity assessment',
-          link: 'https://docs.google.com/document/d/14vm7NXbF5iPN2celAhsWq2mNH2-dcdUE/edit',
-          tags: ['NC'],
-          keyPoints: [
-            'Verify no contact occurred',
-            'Measure minimum distance achieved',
-            'Check for evasive maneuvers by any party',
-            'Assess potential for collision without intervention'
-          ],
-          commonMistakes: [
-            'Confusing with actual collisions',
-            'Not measuring proximity accurately',
-            'Missing evasive actions',
-            'Incorrect severity classification'
-          ]
-        },
-        {
-          id: 'near-collision-support',
-          title: 'Near Collision | Support Documentation',
-          description: 'Additional support materials for near collision evaluation',
-          link: 'https://docs.google.com/document/d/1joK06daF2RuEM2u_MehoI8cjtpMlkQYozU0oiPwi7F0/edit#',
-          tags: ['NC'],
-          keyPoints: [
-            'Use multiple camera angles when available',
-            'Cross-reference with other sensor data',
-            'Document all parties involved',
-            'Consider environmental factors'
-          ]
-        },
-        {
-          id: 'unsafe-parking',
-          title: 'Unsafe Parking (USP)',
-          description: 'Guidelines for identifying unsafe parking situations',
-          link: 'https://docs.google.com/document/d/1f6PFmLnPn93FbulPaiM2yt1Omb4GF-S1_Uq_IAb4mP0/edit?tab=t.0',
-          tags: ['USP'],
-          keyPoints: [
-            'Check if parking creates hazard for other vehicles',
-            'Verify parking location against regulations',
-            'Assess impact on traffic flow',
-            'Consider visibility and safety factors'
-          ],
-          commonMistakes: [
-            'Not considering parking location legality',
-            'Missing safety implications',
-            'Incorrect hazard assessment',
-            'Not evaluating traffic impact'
-          ]
-        },
-        {
-          id: 'positive-driving',
-          title: 'Positive Driving Behavior (AD + SD)',
-          description: 'Recognition criteria for positive driving behaviors',
-          link: 'https://docs.google.com/document/d/1kLxJ64XHmP9SOz5P_2dPT46jwRsC7LoSVkc3-OGQc_M/edit?tab=t.0#heading=h.yz6h9dvvgx74',
-          tags: ['AD', 'SD'],
-          keyPoints: [
-            'Identify smooth acceleration/deceleration patterns',
-            'Consider traffic flow and conditions',
-            'Verify behavior is genuinely positive',
-            'Look for anticipatory driving skills'
           ]
         }
       ]
@@ -316,32 +340,6 @@ const GuidelinesPanel = () => {
             'Missing partial obstructions',
             'Not considering impact on functionality'
           ]
-        },
-        {
-          id: 'camera-obstruction-examples',
-          title: 'Camera Obstruction - Examples',
-          description: 'Visual examples and case studies of camera obstruction events',
-          link: 'https://docs.google.com/document/d/1WfAHoHbi281jE9BongPSpF-n0uAoRgQC7aAoFHSMaXk/edit',
-          tags: ['DFCO', 'RFCO'],
-          keyPoints: [
-            'Study various obstruction types and patterns',
-            'Learn from real-world examples',
-            'Understand edge cases and exceptions',
-            'Practice identification techniques'
-          ]
-        },
-        {
-          id: 'invalid-events',
-          title: 'Invalid Event - All Types',
-          description: 'Comprehensive guide for identifying invalid events across all categories',
-          link: 'https://docs.google.com/document/d/1zZ9qIQUsszWibazTKFiZrbHT30F8OcAn17vtgUINQ4o/edit#heading=h.vtl1asmmsqdp',
-          tags: ['General'],
-          keyPoints: [
-            'Understand criteria for event validity',
-            'Learn common invalid event patterns',
-            'Apply consistent validation standards',
-            'Document invalidation reasoning clearly'
-          ]
         }
       ]
     },
@@ -368,10 +366,48 @@ const GuidelinesPanel = () => {
             'Not assessing actual impact evidence',
             'Incomplete damage assessment'
           ]
+        },
+        {
+          id: 'near-collision',
+          title: 'Near Collision (NC)',
+          description: 'Near collision event identification and severity assessment',
+          link: 'https://docs.google.com/document/d/14vm7NXbF5iPN2celAhsWq2mNH2-dcdUE/edit',
+          tags: ['NC'],
+          keyPoints: [
+            'Verify no contact occurred',
+            'Measure minimum distance achieved',
+            'Check for evasive maneuvers by any party',
+            'Assess potential for collision without intervention'
+          ],
+          commonMistakes: [
+            'Confusing with actual collisions',
+            'Not measuring proximity accurately',
+            'Missing evasive actions',
+            'Incorrect severity classification'
+          ]
         }
       ]
     }
   };
+
+  // Add performance-based recommendations to the recommended category
+  if (performanceBasedRecs.length > 0) {
+    const allDocuments = Object.values(documentationData).flatMap(category => category.documents);
+    
+    documentationData.recommended.documents = performanceBasedRecs.map(rec => {
+      const doc = allDocuments.find(d => d.tags.includes(rec.tag));
+      if (doc) {
+        return {
+          ...doc,
+          performanceGap: rec.gap,
+          priority: rec.priority,
+          reason: rec.reason,
+          isRecommended: true
+        };
+      }
+      return null;
+    }).filter(Boolean);
+  }
 
   const allDocuments = Object.values(documentationData)
     .flatMap(category => category.documents)
@@ -386,8 +422,25 @@ const GuidelinesPanel = () => {
     window.open(link, '_blank', 'noopener,noreferrer');
   };
 
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'high': return '#ef4444';
+      case 'medium': return '#f59e0b';
+      case 'low': return '#22c55e';
+      default: return '#6b7280';
+    }
+  };
+
   const renderDocumentCard = (doc, index) => (
-    <div key={doc.id} className="document-card" style={{ animationDelay: `${index * 0.1}s` }}>
+    <div key={doc.id} className={`document-card ${doc.isRecommended ? 'recommended' : ''}`} style={{ animationDelay: `${index * 0.1}s` }}>
+      {doc.isRecommended && (
+        <div className="recommendation-banner" style={{ backgroundColor: getPriorityColor(doc.priority) }}>
+          <AlertTriangle size={16} />
+          <span>{doc.priority.toUpperCase()} PRIORITY</span>
+          <span>Gap: {doc.performanceGap}%</span>
+        </div>
+      )}
+      
       <div className="document-header">
         <h3>{doc.title}</h3>
         <div className="document-tags">
@@ -398,6 +451,13 @@ const GuidelinesPanel = () => {
       </div>
       
       <p className="document-description">{doc.description}</p>
+      
+      {doc.isRecommended && (
+        <div className="performance-reason">
+          <TrendingDown size={16} />
+          <span>{doc.reason}</span>
+        </div>
+      )}
       
       {doc.keyPoints && (
         <div className="document-section">
@@ -423,10 +483,11 @@ const GuidelinesPanel = () => {
       
       <div className="document-actions">
         <button 
-          className="primary-action"
+          className={`primary-action ${doc.isRecommended ? 'urgent' : ''}`}
           onClick={() => openDocument(doc.link)}
         >
-          📖 Open Documentation
+          <BookOpen size={16} />
+          {doc.isRecommended ? 'Study Now (Recommended)' : 'Open Documentation'}
         </button>
       </div>
     </div>
@@ -437,7 +498,7 @@ const GuidelinesPanel = () => {
       <div className="guidelines-header">
         <div className="header-left">
           <h2>📚 QA Guidelines & Documentation</h2>
-          <p>Comprehensive documentation for all QA tag types with examples and best practices</p>
+          <p>Comprehensive documentation with performance-based recommendations</p>
         </div>
         
         <div className="header-controls">
@@ -449,7 +510,7 @@ const GuidelinesPanel = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
-            <span className="search-icon">🔍</span>
+            <Search className="search-icon" size={20} />
           </div>
         </div>
       </div>
@@ -460,13 +521,18 @@ const GuidelinesPanel = () => {
           {Object.entries(documentationData).map(([key, category]) => (
             <button
               key={key}
-              className={`category-button ${selectedCategory === key ? 'active' : ''}`}
+              className={`category-button ${selectedCategory === key ? 'active' : ''} ${key === 'recommended' && performanceBasedRecs.length > 0 ? 'has-recommendations' : ''}`}
               onClick={() => setSelectedCategory(key)}
             >
               <span className="category-icon">{category.icon}</span>
               <div className="category-info">
                 <div className="category-title">{category.title}</div>
-                <div className="category-count">{category.documents.length} docs</div>
+                <div className="category-count">
+                  {category.documents.length} docs
+                  {key === 'recommended' && performanceBasedRecs.length > 0 && (
+                    <span className="rec-badge">{performanceBasedRecs.length} recommended</span>
+                  )}
+                </div>
               </div>
             </button>
           ))}
@@ -506,6 +572,14 @@ const GuidelinesPanel = () => {
               </div>
               <p className="category-description">{documentationData[selectedCategory].description}</p>
               
+              {selectedCategory === 'recommended' && performanceBasedRecs.length === 0 && (
+                <div className="no-recommendations">
+                  <div className="no-rec-icon">🎉</div>
+                  <h4>Excellent Performance!</h4>
+                  <p>No specific documentation recommendations based on your current performance. Keep up the great work!</p>
+                </div>
+              )}
+              
               <div className="documents-grid">
                 {documentationData[selectedCategory].documents
                   .filter(doc => 
@@ -529,8 +603,8 @@ const GuidelinesPanel = () => {
             <span className="stat-label">Total Documents</span>
           </div>
           <div className="stat-item">
-            <span className="stat-number">{Object.keys(documentationData).length}</span>
-            <span className="stat-label">Categories</span>
+            <span className="stat-number">{performanceBasedRecs.length}</span>
+            <span className="stat-label">Recommended</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">24/7</span>
@@ -539,7 +613,7 @@ const GuidelinesPanel = () => {
         </div>
         
         <div className="footer-note">
-          <p>💡 <strong>Tip:</strong> Use the search function to quickly find specific tags or topics. All documents open in new tabs for easy reference.</p>
+          <p>💡 <strong>Smart Recommendations:</strong> Documentation is automatically recommended based on your performance gaps and improvement opportunities.</p>
         </div>
       </div>
     </div>
