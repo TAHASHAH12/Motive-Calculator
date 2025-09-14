@@ -51,7 +51,7 @@ const LoginScreen = ({ onLogin }) => {
           <Building size={24} className="hdr-icon" />
           <h1>Annotations</h1>
           <h2>Performance Dashboard</h2>
-          <p>Sign in to access your QA insights</p>
+          <p>Sign in to access your QA insights and KPIs</p>
         </header>
 
         <div className="field">
