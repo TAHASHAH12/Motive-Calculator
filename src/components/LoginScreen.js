@@ -34,7 +34,7 @@ const LoginScreen = ({ onLogin }) => {
     <div className="login-screen">
       {/* Motive logo link — top-right */}
       <a
-        href="https://imgbb.com/"
+        href="https://gomotive.com/"
         className="logo-link"
         target="_blank"
         rel="noopener noreferrer"
