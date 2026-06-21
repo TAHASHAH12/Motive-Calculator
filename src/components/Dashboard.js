@@ -6,6 +6,8 @@ import QAAnalysis from './QAAnalysis';
 import KPIMetrics from './KPIMetrics';
 import AIInsights from './AIInsights';
 import GuidelinesPanel from './GuidelinesPanel';
+import RecurringMistakes from './RecurringMistakes';
+import ReviewVideos from './ReviewVideos';
 import AIChatBot from './AIChatBot';
 import { fetchGoogleSheetsData } from '../services/googleSheets';
 import './Dashboard.css';
@@ -124,6 +126,10 @@ const Dashboard = ({ userInfo, onLogout }) => {
         return <PerformanceOverview data={data} userInfo={userInfo} />;
       case 'qa-analysis':
         return <QAAnalysis data={data.qaData} userInfo={userInfo} />;
+      case 'recurring-mistakes':
+        return <RecurringMistakes data={data.qaData} userInfo={userInfo} />;
+      case 'review-videos':
+        return <ReviewVideos data={data.qaData} userInfo={userInfo} />;
       case 'kpi-metrics':
         return <KPIMetrics data={data.kpiData} userInfo={userInfo} />;
       case 'ai-insights':
@@ -174,6 +180,20 @@ const Dashboard = ({ userInfo, onLogout }) => {
             >
               <span className="tab-icon">🎯</span>
               <span>QA Analysis</span>
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'recurring-mistakes' ? 'active' : ''}`}
+              onClick={() => setActiveTab('recurring-mistakes')}
+            >
+              <span className="tab-icon">🔁</span>
+              <span>Recurring Mistakes</span>
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'review-videos' ? 'active' : ''}`}
+              onClick={() => setActiveTab('review-videos')}
+            >
+              <span className="tab-icon">🎬</span>
+              <span>Review Videos</span>
             </button>
             <button
               className={`tab-button ${activeTab === 'kpi-metrics' ? 'active' : ''}`}

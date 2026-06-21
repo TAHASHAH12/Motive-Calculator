@@ -58,6 +58,45 @@ body{margin:0;font-family:'Poppins',sans-serif}
 }
 @keyframes fadeUp{0%{opacity:0;transform:translateY(40px)}100%{opacity:1;transform:none}}
 
+/* role switch */
+.role-switch{
+  display:flex;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--radius);
+  padding:.25rem;
+  gap:.25rem;
+}
+.role-btn{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.4rem;
+  background:transparent;
+  border:none;
+  color:var(--gray);
+  padding:.6rem .5rem;
+  border-radius:calc(var(--radius) - 6px);
+  font-family:inherit;
+  font-size:.85rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:.25s;
+}
+.role-btn.active{
+  background:var(--white);
+  color:var(--black);
+}
+
+/* demo credentials hint */
+.demo-hint{
+  margin:-.4rem 0 0;
+  text-align:center;
+  font-size:.75rem;
+  color:var(--gray);
+}
+
 /* header */
 .header{text-align:center}
 .hdr-icon{vertical-align:-3px;margin-right:.3rem}

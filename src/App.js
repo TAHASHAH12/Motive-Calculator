@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import LoginScreen from './components/LoginScreen';
 import Dashboard from './components/Dashboard';
+import ManagerDashboard from './components/ManagerDashboard';
 import './App.css';
 
 function App() {
@@ -35,6 +36,8 @@ function App() {
       <div className="App">
         {!isAuthenticated ? (
           <LoginScreen onLogin={handleLogin} />
+        ) : userInfo.role === 'manager' ? (
+          <ManagerDashboard userInfo={userInfo} onLogout={handleLogout} />
         ) : (
           <Dashboard userInfo={userInfo} onLogout={handleLogout} />
         )}
